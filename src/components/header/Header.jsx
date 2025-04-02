@@ -5,7 +5,7 @@ const Header = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          Meu Site
+          Total Health
         </Link>
         <button
           className="navbar-toggler"
@@ -31,6 +31,9 @@ const Header = () => {
               <Link className="nav-link" to="/contato#navbar">
                 Contato
               </Link>
+            </li>
+            <li>
+              
             </li>
           </ul>
         </div>

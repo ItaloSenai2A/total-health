@@ -2,7 +2,8 @@
 
 const Agendamento = () => {
   return (
-    <h2>Agendamento</h2>
+    <h1>Agendamento</h1>
+    
   )
 }
 
