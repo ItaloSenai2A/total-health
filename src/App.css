@@ -17,12 +17,7 @@ main {
   flex: 1; /* Faz o conteúdo principal ocupar o espaço restante */
 }
 
-.cover-banner-img {
-  width: 100%;
-  max-height: 400px; /* Altura máxima aumentada para 400px */
-  object-fit: contain; /* Garante que toda a imagem seja exibida sem corte */
-  display: block;
+.logoMobile {
+  filter: invert(1);
+  mix-blend-mode: screen;
 }
-
-
-
