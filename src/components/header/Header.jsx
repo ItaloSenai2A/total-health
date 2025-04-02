@@ -5,7 +5,6 @@ const Header = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          Total Health
         </Link>
         <button
           className="navbar-toggler"

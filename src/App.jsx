@@ -5,7 +5,7 @@ import "./App.css";
 
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
-import Logo from "./assets/LogotipoTotalHealth.webp"; // Logo inserida
+import Logo from "./assets/LogotipoTotalHealth-Photoroom.png"; // Logo inserida
 
 import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
@@ -26,14 +26,17 @@ const Home = () => {
   return (
     <div className="container-fluid">
       <div className="row">
-        {/* Barra lateral */}
-        <div className="col-3 bg-dark text-white vh-100 p-4">
+        {/* Barra lateral com fundo vermelho escuro */}
+        <div
+          className="col-3 text-white vh-100 p-4"
+          style={{ backgroundColor: "#8B0000" }}
+        >
           <div className="text-center mb-4">
             <img
               src={Logo}
               alt="TotalHealth Logo"
               className="img-fluid"
-              style={{ maxWidth: "150px" }}
+              style={{ maxWidth: "250px" }}  // Logo maior
             />
           </div>
           <ul className="nav flex-column">
@@ -53,7 +56,10 @@ const Home = () => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-white" href="/medicoEspecialidade">
+              <a
+                className="nav-link text-white"
+                href="/medicoEspecialidade"
+              >
                 Médico/Especialidades
               </a>
             </li>
@@ -89,9 +95,6 @@ const Home = () => {
             </li>
           </ul>
           <div className="mt-4">
-            {/* <a className="nav-link text-white" href="/perfil">
-              Perfil
-            </a> */}
             <a className="nav-link text-white" href="/sair">
               Sair
             </a>
@@ -99,38 +102,7 @@ const Home = () => {
             <p className="fw-bold">+91 - 999 999 9999</p>
           </div>
         </div>
-
-        {/* Conteúdo principal */}
-        <div className="col-9 p-5">
-          <h2>Nova Prescrição</h2>
-          <form className="mt-4">
-            <div className="mb-3">
-              <label className="form-label">Consulta</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Digite a consulta"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Valor</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Digite o valor"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Descrição</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Digite a descrição"
-              />
-            </div>
-            <button className="btn btn-primary">Criar</button>
-          </form>
-        </div>
+        {/* Conteúdo principal removido */}
       </div>
     </div>
   );
@@ -148,7 +120,10 @@ function App() {
           <Route path="/usuario" element={<Usuario />} />
           <Route path="/prescricao" element={<Prescricao />} />
           <Route path="/pagamento" element={<Pagamento />} />
-          <Route path="/medicoEspecialidades" element={<MedicoEspecialidade />}/>
+          <Route
+            path="/medicoEspecialidades"
+            element={<MedicoEspecialidade />}
+          />
           <Route path="/medico" element={<Medico />} />
           <Route path="/exame" element={<Exame />} />
           <Route path="/especialidade" element={<Especialidade />} />
