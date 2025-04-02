@@ -14,3 +14,7 @@ main {
   flex: 1; /* Faz o conteúdo principal ocupar o espaço restante */
 }
 
+.logoMobile {
+  filter: invert(1);
+  mix-blend-mode: screen;
+}
