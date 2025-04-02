@@ -1,5 +1,3 @@
-
-
 const Prescricao = () => {
   return (
     <div>Prescricao</div>
