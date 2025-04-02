@@ -20,6 +20,7 @@ import Consulta from "./pages/Consulta";
 import Agendamento from "./pages/Agendamento";
 import Sair from "./pages/Sair";
 import NaoEncontrado from "./pages/NaoEncontrado";
+import NovaConsulta from "./pages/NovaConsulta";
 
 const Home = () => {
   return (
@@ -155,6 +156,7 @@ function App() {
           <Route path="/agendamento" element={<Agendamento />} />
           <Route path="/sair" element={<Sair />} />
           <Route path="*" element={<NaoEncontrado />} />
+          <Route path="/consulta/nova" element={<NovaConsulta />} />
         </Routes>
       </main>
       <Footer />
