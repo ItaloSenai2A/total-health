@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&display=swap');
+
+
 * {
   margin: 0;
   padding: 0;
@@ -13,4 +16,13 @@
 main {
   flex: 1; /* Faz o conteúdo principal ocupar o espaço restante */
 }
+
+.cover-banner-img {
+  width: 100%;
+  max-height: 400px; /* Altura máxima aumentada para 400px */
+  object-fit: contain; /* Garante que toda a imagem seja exibida sem corte */
+  display: block;
+}
+
+
 
