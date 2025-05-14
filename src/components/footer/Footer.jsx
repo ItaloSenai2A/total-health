@@ -5,11 +5,11 @@ const Footer = () => {
     <footer
       className="bg-dark text-white text-center py-3"
       style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        width: "100%",
-        zIndex: 10,
+        position: "fixed",  // Fixa o footer na tela
+        bottom: 0,         // Coloca o footer na parte inferior
+        left: 0,           // Alinha à esquerda
+        width: "100%",     // Faz com que ocupe toda a largura da tela
+        zIndex: 10,        // Garante que o footer fique acima de outros elementos
       }}
     >
       <div className="container">
