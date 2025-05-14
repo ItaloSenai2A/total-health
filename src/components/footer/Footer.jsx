@@ -2,7 +2,16 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-dark text-white text-center py-3">
+    <footer
+      className="bg-dark text-white text-center py-3"
+      style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        width: "100%",
+        zIndex: 10,
+      }}
+    >
       <div className="container">
         <p className="mb-0">
           © 2025 TotalHealth. Todos os direitos reservados.
