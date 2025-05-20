@@ -1,34 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Button, Form, Modal, Row, Col } from "react-bootstrap";
 
 const Pagamento = () => {
-  const [pagamentos, setPagamentos] = useState([
-    {
-      nomePaciente: "João da Silva",
-      valorConsulta: 350.0,
-      dataPagamento: "2025-05-20T14:30:00",
-      exame: "Ultrassonografia",
-      valorExame: 150.0,
-    },
-    {
-      nomePaciente: "Maria Oliveira",
-      valorConsulta: 280.0,
-      dataPagamento: "2025-05-18T09:00:00",
-      exame: "Raio-X",
-      valorExame: 90.0,
-    },
-  ]);
-
+  const [pagamentos, setPagamentos] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(null);
-  const [editIndex, setEditIndex] = useState(null);
+  const [editarPagamentoId, setEditarPagamentoId] = useState(null);
 
-  const [form, setForm] = useState({
-    nomePaciente: "",
-    valorConsulta: "",
-    dataPagamento: "",
-    exame: "",
-    valorExame: "",
+  const [novoPagamento, setNovoPagamento] = useState({
+    ConsultaId: "",
+    Valor: "",
+    DataPagamento: "",
+    ExameId: "",
+    ValorExame: "",
   });
 
   const cores = {
@@ -37,303 +20,260 @@ const Pagamento = () => {
     botaoHover: "#A30000",
     botaoAtivo: "#C0392B",
     fundoCard: "#FFFFFF",
-    textoTitulo: "#8B1C27",
+    textoTitulo: "#1C1C1C",
     textoSecundario: "#3A3A3A",
     bordaDourada: "#D4AF37",
-    totalVerde: "#198754",
   };
 
-  const abrirModalAdd = () => {
-    setForm({
-      nomePaciente: "",
-      valorConsulta: "",
-      dataPagamento: "",
-      exame: "",
-      valorExame: "",
-    });
-    setEditIndex(null);
-    setModalType("edit");
-    setShowModal(true);
-  };
+  useEffect(() => {
+    const dados = localStorage.getItem("totalhealth_pagamentos");
+    if (dados) setPagamentos(JSON.parse(dados));
+  }, []);
 
-  const abrirModalEdit = (index) => {
-    setForm({ ...pagamentos[index] });
-    setEditIndex(index);
-    setModalType("edit");
-    setShowModal(true);
-  };
-
-  const abrirModalDelete = (index) => {
-    setEditIndex(index);
-    setModalType("delete");
-    setShowModal(true);
-  };
-
-  const fecharModal = () => {
-    setShowModal(false);
-    setModalType(null);
-    setEditIndex(null);
-    setForm({
-      nomePaciente: "",
-      valorConsulta: "",
-      dataPagamento: "",
-      exame: "",
-      valorExame: "",
-    });
+  const salvarPagamentos = (lista) => {
+    localStorage.setItem("totalhealth_pagamentos", JSON.stringify(lista));
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNovoPagamento((prev) => ({ ...prev, [name]: value }));
   };
 
-  const salvarPagamento = () => {
-    if (
-      !form.nomePaciente ||
-      !form.valorConsulta ||
-      !form.dataPagamento ||
-      !form.exame ||
-      !form.valorExame
-    ) {
-      alert("Por favor, preencha todos os campos.");
-      return;
+  const validarCampos = () => {
+    if (!novoPagamento.ConsultaId || !novoPagamento.Valor) {
+      alert("Consulta ID e Valor são obrigatórios.");
+      return false;
     }
-    const novoPagamento = {
-      nomePaciente: form.nomePaciente,
-      valorConsulta: parseFloat(form.valorConsulta),
-      dataPagamento: form.dataPagamento,
-      exame: form.exame,
-      valorExame: parseFloat(form.valorExame),
-    };
+    if (isNaN(parseFloat(novoPagamento.Valor))) {
+      alert("Valor deve ser numérico.");
+      return false;
+    }
+    return true;
+  };
 
-    let listaAtualizada;
-    if (editIndex !== null) {
-      listaAtualizada = pagamentos.map((p, i) =>
-        i === editIndex ? novoPagamento : p
+  const abrirModalNovo = () => {
+    setEditarPagamentoId(null);
+    setNovoPagamento({
+      ConsultaId: "",
+      Valor: "",
+      DataPagamento: "",
+      ExameId: "",
+      ValorExame: "",
+    });
+    setShowModal(true);
+  };
+
+  const abrirModalEditar = (pagamento) => {
+    setEditarPagamentoId(pagamento.PagamentoId);
+    setNovoPagamento({
+      ConsultaId: pagamento.ConsultaId,
+      Valor: pagamento.Valor.toString(),
+      DataPagamento: pagamento.DataPagamento ? pagamento.DataPagamento.split("T")[0] : "",
+      ExameId: pagamento.ExameId,
+      ValorExame: pagamento.ValorExame?.toString() || "",
+    });
+    setShowModal(true);
+  };
+
+  const handleAddEditarPagamento = () => {
+    if (!validarCampos()) return;
+
+    if (editarPagamentoId) {
+      const listaAtualizada = pagamentos.map((p) =>
+        p.PagamentoId === editarPagamentoId
+          ? {
+              ...novoPagamento,
+              PagamentoId: editarPagamentoId,
+              Valor: parseFloat(novoPagamento.Valor),
+              ValorExame: parseFloat(novoPagamento.ValorExame) || 0,
+            }
+          : p
       );
+      setPagamentos(listaAtualizada);
+      salvarPagamentos(listaAtualizada);
     } else {
-      listaAtualizada = [...pagamentos, novoPagamento];
+      const pagamentoComId = {
+        ...novoPagamento,
+        PagamentoId: crypto.randomUUID(),
+        Valor: parseFloat(novoPagamento.Valor),
+        ValorExame: parseFloat(novoPagamento.ValorExame) || 0,
+      };
+      const novaLista = [...pagamentos, pagamentoComId];
+      setPagamentos(novaLista);
+      salvarPagamentos(novaLista);
     }
 
-    setPagamentos(listaAtualizada);
-    fecharModal();
+    setShowModal(false);
   };
 
-  const confirmarExclusao = () => {
-    const listaAtualizada = pagamentos.filter((_, i) => i !== editIndex);
-    setPagamentos(listaAtualizada);
-    fecharModal();
+  const handleExcluir = (id) => {
+    if (window.confirm("Deseja realmente excluir este pagamento?")) {
+      const novaLista = pagamentos.filter((p) => p.PagamentoId !== id);
+      setPagamentos(novaLista);
+      salvarPagamentos(novaLista);
+    }
   };
 
   return (
     <div
-      className="container py-5"
-      style={{ backgroundColor: cores.fundoTela, minHeight: "100vh" }}
+      className="container my-4"
+      style={{ backgroundColor: cores.fundoTela, minHeight: "100vh", padding: "20px" }}
     >
-      <div className="text-center mb-4">
-        <Button
-          style={{
-            backgroundColor: cores.botaoPrincipal,
-            borderColor: cores.botaoPrincipal,
-            fontWeight: "bold",
-            borderRadius: 8,
-            minWidth: 1200,
-            padding: "12px 24px",
-          }}
-          onClick={abrirModalAdd}
-          onMouseOver={(e) =>
-            (e.currentTarget.style.backgroundColor = cores.botaoHover)
-          }
-          onMouseOut={(e) =>
-            (e.currentTarget.style.backgroundColor = cores.botaoPrincipal)
-          }
-        >
-          + Adicionar Pagamento
-        </Button>
-      </div>
+      <h2 className="mb-4" style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+        Gerenciar Pagamentos
+      </h2>
 
-      <Row xs={1} md={2} className="g-4">
-        {pagamentos.length === 0 && (
-          <p className="text-center w-100" style={{ color: cores.textoSecundario }}>
-            Nenhum pagamento cadastrado.
-          </p>
-        )}
-        {pagamentos.map((pagamento, index) => (
-          <Col key={index}>
-            <Card
-              className="h-100 shadow-sm"
-              style={{
-                backgroundColor: cores.fundoCard,
-                border: `1px solid ${cores.bordaDourada}`,
-                borderRadius: 16,
-              }}
-            >
-              <Card.Body>
-                <Card.Title style={{ color: cores.textoTitulo, fontWeight: "bold" }}>
-                  {pagamento.nomePaciente}
-                </Card.Title>
-                <hr />
-                <Card.Text>
-                  <strong>Data do Pagamento:</strong>{" "}
-                  {new Date(pagamento.dataPagamento).toLocaleDateString("pt-BR")}
-                </Card.Text>
-                <Card.Text>
-                  <strong>Valor da Consulta:</strong> R$ {pagamento.valorConsulta.toFixed(2)}
-                </Card.Text>
-                <Card.Text>
-                  <strong>Exame:</strong> {pagamento.exame}
-                </Card.Text>
-                <Card.Text>
-                  <strong>Valor do Exame:</strong> R$ {pagamento.valorExame.toFixed(2)}
-                </Card.Text>
-                <Card.Text>
-                  <strong>Total:</strong>{" "}
-                  <span style={{ color: cores.totalVerde, fontWeight: "bold" }}>
-                    R$ {(pagamento.valorConsulta + pagamento.valorExame).toFixed(2)}
-                  </span>
-                </Card.Text>
+      <Card
+        className="mb-4"
+        onClick={abrirModalNovo}
+        style={{
+          cursor: "pointer",
+          backgroundColor: cores.botaoPrincipal,
+          color: "#fff",
+          border: `2px solid ${cores.bordaDourada}`,
+          textAlign: "center",
+        }}
+      >
+        <Card.Body>
+          <h5>+ Adicionar Novo Pagamento</h5>
+        </Card.Body>
+      </Card>
 
-                <div className="d-flex gap-2">
-                  <Button
-                    variant="primary"
-                    style={{ borderRadius: 8 }}
-                    onClick={() => abrirModalEdit(index)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="danger"
-                    style={{ borderRadius: 8 }}
-                    onClick={() => abrirModalDelete(index)}
-                  >
-                    Excluir
-                  </Button>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      {/* Modal de adicionar/editar */}
       <Modal
-        show={showModal && modalType === "edit"}
-        onHide={fecharModal}
+        show={showModal}
+        onHide={() => setShowModal(false)}
         centered
         backdrop="static"
+        keyboard={false}
         size="lg"
       >
-        <Modal.Header
-          closeButton
-          style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }}
-        >
-          <Modal.Title>
-            {editIndex !== null ? "Editar Pagamento" : "Adicionar Novo Pagamento"}
-          </Modal.Title>
+        <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
+          <Modal.Title>{editarPagamentoId ? "Editar Pagamento" : "Adicionar Novo Pagamento"}</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: cores.fundoCard }}>
+        <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
           <Form>
-            <Form.Group controlId="nomePaciente" className="mb-3">
-              <Form.Label>Nome do Paciente</Form.Label>
+            <Form.Group className="mb-3" controlId="formConsultaId">
+              <Form.Label>Consulta ID *</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Nome do Paciente"
-                name="nomePaciente"
-                value={form.nomePaciente}
+                name="ConsultaId"
+                value={novoPagamento.ConsultaId}
                 onChange={handleChange}
-                required
+                placeholder="ID da consulta"
               />
             </Form.Group>
 
-            <Form.Group controlId="valorConsulta" className="mb-3">
-              <Form.Label>Valor da Consulta (R$)</Form.Label>
+            <Form.Group className="mb-3" controlId="formValor">
+              <Form.Label>Valor (Consulta) *</Form.Label>
               <Form.Control
                 type="number"
                 step="0.01"
-                placeholder="Valor da Consulta"
-                name="valorConsulta"
-                value={form.valorConsulta}
+                name="Valor"
+                value={novoPagamento.Valor}
                 onChange={handleChange}
-                required
+                placeholder="Valor da consulta"
               />
             </Form.Group>
 
-            <Form.Group controlId="dataPagamento" className="mb-3">
+            <Form.Group className="mb-3" controlId="formDataPagamento">
               <Form.Label>Data do Pagamento</Form.Label>
               <Form.Control
-                type="datetime-local"
-                name="dataPagamento"
-                value={form.dataPagamento}
+                type="date"
+                name="DataPagamento"
+                value={novoPagamento.DataPagamento}
                 onChange={handleChange}
-                required
               />
             </Form.Group>
 
-            <Form.Group controlId="exame" className="mb-3">
-              <Form.Label>Exame</Form.Label>
+            <Form.Group className="mb-3" controlId="formExameId">
+              <Form.Label>Exame ID</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Exame"
-                name="exame"
-                value={form.exame}
+                name="ExameId"
+                value={novoPagamento.ExameId}
                 onChange={handleChange}
-                required
+                placeholder="ID do exame"
               />
             </Form.Group>
 
-            <Form.Group controlId="valorExame" className="mb-3">
-              <Form.Label>Valor do Exame (R$)</Form.Label>
+            <Form.Group className="mb-3" controlId="formValorExame">
+              <Form.Label>Valor (Exame)</Form.Label>
               <Form.Control
                 type="number"
                 step="0.01"
-                placeholder="Valor do Exame"
-                name="valorExame"
-                value={form.valorExame}
+                name="ValorExame"
+                value={novoPagamento.ValorExame}
                 onChange={handleChange}
-                required
+                placeholder="Valor do exame"
               />
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: cores.fundoCard }}>
-          <Button variant="secondary" onClick={fecharModal}>
+        <Modal.Footer style={{ backgroundColor: cores.botaoPrincipal }}>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
           <Button
-            variant="success"
-            onClick={salvarPagamento}
-            style={{ fontWeight: "bold" }}
+            style={{ backgroundColor: cores.botaoAtivo, border: "none" }}
+            onClick={handleAddEditarPagamento}
           >
-            Salvar
+            {editarPagamentoId ? "Salvar Alterações" : "Salvar"}
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de confirmação de exclusão */}
-      <Modal
-        show={showModal && modalType === "delete"}
-        onHide={fecharModal}
-        centered
-        backdrop="static"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmar Exclusão</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Tem certeza que deseja excluir este pagamento?
-          <br />
-          <strong>
-            {editIndex !== null ? pagamentos[editIndex]?.nomePaciente : ""}
-          </strong>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={fecharModal}>
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={confirmarExclusao}>
-            Excluir
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <Row>
+        {pagamentos.length === 0 ? (
+          <p className="text-center" style={{ color: cores.textoSecundario, width: "100%" }}>
+            Nenhum pagamento cadastrado.
+          </p>
+        ) : (
+          pagamentos.map((pagamento) => (
+            <Col md={4} lg={3} sm={6} key={pagamento.PagamentoId} className="mb-4">
+              <Card
+                style={{
+                  backgroundColor: cores.fundoCard,
+                  border: `2px solid ${cores.bordaDourada}`,
+                  color: cores.textoTitulo,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "100%",
+                }}
+              >
+                <Card.Body>
+                  <Card.Title style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+                    Pagamento
+                  </Card.Title>
+                  <Card.Text>
+                    <strong>Consulta ID:</strong> {pagamento.ConsultaId || "-"} <br />
+                    <strong>Valor:</strong> R$ {pagamento.Valor.toFixed(2)} <br />
+                    <strong>Data:</strong> {pagamento.DataPagamento || "-"} <br />
+                    <strong>Exame ID:</strong> {pagamento.ExameId || "-"} <br />
+                    <strong>Valor Exame:</strong> R$ {pagamento.ValorExame?.toFixed(2) || "0.00"}
+                  </Card.Text>
+                </Card.Body>
+                <Card.Footer className="d-flex justify-content-between">
+                  <Button
+                    variant="outline-primary"
+                    onClick={() => abrirModalEditar(pagamento)}
+                    style={{ borderColor: cores.botaoPrincipal, color: cores.botaoPrincipal }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    onClick={() => handleExcluir(pagamento.PagamentoId)}
+                    style={{ borderColor: cores.botaoAtivo, color: cores.botaoAtivo }}
+                  >
+                    Excluir
+                  </Button>
+                </Card.Footer>
+              </Card>
+            </Col>
+          ))
+        )}
+      </Row>
     </div>
   );
 };
