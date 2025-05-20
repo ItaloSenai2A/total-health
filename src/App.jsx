@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes} from "react-router";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import "./App.css";
@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
-import Logo from "./assets/LogotipoTotalHealth-Photoroom.png";
 import Logo from "./assets/LogotipoTotalHealth-Photoroom.png";
 import LogoMobile from "./assets/LogotipoTotalHealth-Mobile.png";
 import HeaderMobile from "./components/header/HeaderMobile";
@@ -29,6 +28,7 @@ import NaoEncontrado from "./pages/NaoEncontrado";
 import NovaConsulta from "./pages/NovaConsulta";
 import Perfil from "./pages/Perfil";
 import Home from "./pages/Home";
+import Usuario from "./pages/Usuario";
 
 function App() {
   const [usuario, setUsuario] = useState(
