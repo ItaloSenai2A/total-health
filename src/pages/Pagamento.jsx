@@ -39,7 +39,7 @@ const Pagamento = () => {
     fundoCard: "#FFFFFF",
     textoTitulo: "#8B1C27",
     textoSecundario: "#3A3A3A",
-    bordaDourada: "#d43763",
+    bordaDourada: "#D4AF37",
     totalVerde: "#198754",
   };
 
