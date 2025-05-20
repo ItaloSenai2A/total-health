@@ -1,4 +1,3 @@
-import style from "./Consulta.module.css";
 import { useNavigate } from "react-router";
 
 const Consulta = () => {
