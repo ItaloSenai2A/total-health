@@ -2,7 +2,7 @@
 
 const MedicoEspecialidade = () => {
   return (
-    <div>MedicoEspecialidade</div>
+    <h1>MedicoEspecialidade</h1>
   )
 }
 
