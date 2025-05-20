@@ -9,12 +9,13 @@ import Footer from "./components/footer/Footer";
 import Logo from "./assets/LogotipoTotalHealth-Photoroom.png";
 import LogoMobile from "./assets/LogotipoTotalHealth-Mobile.png";
 import HeaderMobile from "./components/header/HeaderMobile";
-import TopBar from "./components/header/TopBar"; // NOVO
+import TopBar from "./components/header/TopBar";
+import RotaPrivada from "./components/RotaPrivada"; // IMPORTANTE
 
 // Páginas
 import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
-import LoginCadastro from "./pages/LoginCadastro"; // Aqui já corrigido o nome
+import LoginCadastro from "./pages/LoginCadastro";
 import Prescricao from "./pages/Prescricao";
 import Pagamento from "./pages/Pagamento";
 import MedicoEspecialidade from "./pages/MedicoEspecialidade";
@@ -56,31 +57,128 @@ function App() {
           <TopBar usuario={usuario} />
           <main className="p-4">
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/sobre" element={<Sobre />} />
-              <Route path="/contato" element={<Contato />} />
+              <Route path="/loginCadastro" element={<LoginCadastro onLogin={handleLogin} />} />
+
+              <Route
+                path="/"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Home />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/sobre"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Sobre />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/contato"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Contato />
+                  </RotaPrivada>
+                }
+              />
               <Route
                 path="/usuario"
-                element={<LoginCadastro onLogin={handleLogin} />}
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Usuario />
+                  </RotaPrivada>
+                }
               />
               <Route
-                path="/loginCadastro"
-                element={<LoginCadastro onLogin={handleLogin} />}
+                path="/prescricao"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Prescricao />
+                  </RotaPrivada>
+                }
               />
-              <Route path="/prescricao" element={<Prescricao />} />
-              <Route path="/pagamento" element={<Pagamento />} />
               <Route
-                path="/medicoEspecialidades"
-                element={<MedicoEspecialidade />}
+                path="/pagamento"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Pagamento />
+                  </RotaPrivada>
+                }
               />
-              <Route path="/medico" element={<Medico />} />
-              <Route path="/exame" element={<Exame />} />
-              <Route path="/especialidade" element={<Especialidade />} />
-              <Route path="/consulta" element={<Consulta />} />
-              <Route path="/agendamento" element={<Agendamento />} />
-              <Route path="/consulta/nova" element={<NovaConsulta />} />
-              <Route path="/perfil" element={<Perfil />} />
-              <Route path="/sair" element={<Sair />} />
+              <Route
+                path="/medicoEspecialidade"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <MedicoEspecialidade />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/medico"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Medico />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/exame"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Exame />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/especialidade"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Especialidade />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/consulta"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Consulta />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/agendamento"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Agendamento />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/consulta/nova"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <NovaConsulta />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/perfil"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Perfil />
+                  </RotaPrivada>
+                }
+              />
+              <Route
+                path="/sair"
+                element={
+                  <RotaPrivada usuario={usuario}>
+                    <Sair />
+                  </RotaPrivada>
+                }
+              />
               <Route path="*" element={<NaoEncontrado />} />
             </Routes>
           </main>
