@@ -4,7 +4,7 @@ import {
   FaCalendarAlt,
   FaClipboardList,
   FaStethoscope,
-  FaQuestionCircle,
+  FaUserMd,
 } from "react-icons/fa";
 
 const Home = () => {
@@ -18,7 +18,7 @@ const Home = () => {
         paddingBottom: "60px",
       }}
     >
-      {/* Conteúdo principal com texto à esquerda e imagem à direita */}
+      {/* Texto e imagem principais */}
       <div
         className="row align-items-center"
         style={{ position: "relative", zIndex: 1 }}
@@ -27,24 +27,25 @@ const Home = () => {
           <h1
             style={{
               fontWeight: "700",
-              fontSize: "2.3rem", // levemente maior
+              fontSize: "2.3rem",
               marginBottom: "1rem",
               color: "#8b1a2b",
             }}
           >
-            Clínica Médica Total Health
+            Plataforma Médica Total Health
           </h1>
           <p
             style={{
-              fontSize: "1.15rem", // levemente maior
+              fontSize: "1.15rem",
               marginBottom: "1.5rem",
               color: "#8b1a2b",
             }}
           >
-            Total Health conta com equipamentos de última geração e os melhores profissionais da região.
+            Sistema exclusivo para médicos da clínica gerenciarem pacientes, consultas, exames e agendas de forma simples e segura.
           </p>
           <div className="d-flex gap-2 flex-wrap">
-            <button
+            <a
+              href="tel:+5522999991234"
               className="btn"
               style={{
                 borderRadius: "30px",
@@ -52,13 +53,20 @@ const Home = () => {
                 color: "white",
                 backgroundColor: "#8B1C27",
                 border: "2px solid #8B1C27",
-                fontSize: "1rem", // levemente maior
+                fontSize: "1rem",
                 padding: "8px 16px",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              📞 Ligar (22) 2737-6450
-            </button>
-            <button
+              📞 Ligar (22) 99999-1234
+            </a>
+            <a
+              href="https://wa.me/5522999991234"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn"
               style={{
                 borderRadius: "30px",
@@ -66,78 +74,104 @@ const Home = () => {
                 color: "white",
                 backgroundColor: "#8B1C27",
                 border: "2px solid #8B1C27",
-                fontSize: "1rem", // levemente maior
+                fontSize: "1rem",
                 padding: "8px 16px",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               💬 Agendar por WhatsApp
-            </button>
+            </a>
           </div>
         </div>
 
-        {/* Imagem à direita, menor */}
         <div className="col-md-6 text-center mt-4 mt-md-0">
           <img
             src={Medicos}
             alt="Equipe médica"
             style={{
-              height: "310px", // levemente maior
+              height: "350px",
               objectFit: "contain",
             }}
           />
         </div>
       </div>
 
-      {/* Cards abaixo */}
+      {/* Cards com foco em funcionalidades para médicos */}
       <div className="row row-cols-1 row-cols-md-4 g-3 mt-4">
         {[
           {
             icon: <FaCalendarAlt size={42} color="#8B1C27" />,
-            title: "Pré-Agendamento",
-            text: "Agende agora mesmo seus exames e tenha acesso aos melhores serviços de diagnóstico por imagem.",
-            btn: "Pré-Agendar",
+            title: "Gerenciar Consultas",
+            text: "Visualize, agende e organize seus horários de atendimento e consultas com os pacientes.",
+            btn: "Acessar Agenda",
           },
           {
             icon: <FaClipboardList size={42} color="#8B1C27" />,
-            title: "Resultados Online",
-            text: "Acesse o resultado dos seus exames de maneira rápida e prática agora mesmo.",
-            btn: "Acessar",
+            title: "Prontuários Eletrônicos",
+            text: "Acesse e atualize os prontuários médicos dos seus pacientes com segurança e praticidade.",
+            btn: "Abrir Prontuário",
           },
           {
             icon: <FaStethoscope size={42} color="#8B1C27" />,
-            title: "Exames",
-            text: "Conheça todos os exames e procedimentos oferecidos pela nossa clínica.",
-            btn: "Lista de Exames",
+            title: "Resultados e Exames",
+            text: "Consulte os resultados dos exames solicitados e acompanhe o histórico clínico dos pacientes.",
+            btn: "Ver Exames",
           },
           {
-            icon: <FaQuestionCircle size={42} color="#8B1C27" />,
-            title: "Dúvidas",
-            text: "Veja as perguntas frequentes em relação às nossas atividades.",
-            btn: "Acessar",
+            icon: <FaUserMd size={42} color="#8B1C27" />,
+            title: "Perfil do Médico",
+            text: "Gerencie suas informações profissionais, agenda e comunique-se com a equipe administrativa.",
+            btn: "Editar Perfil",
           },
         ].map((card, index) => (
           <div className="col" key={index}>
             <div
-              className="card text-center p-3"
+              className="card h-100 d-flex flex-column justify-content-between text-center p-3"
               style={{
-                borderRadius: "10px",
+                borderRadius: "12px",
                 backgroundColor: "#f8f9fa",
-                fontSize: "1rem", // levemente maior
+                minHeight: "260px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "16px",
               }}
             >
-              {card.icon}
-              <h6 className="my-2" style={{ color: "#8B1C27", fontWeight: "600" }}>
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ height: "50px" }}
+              >
+                {card.icon}
+              </div>
+              <h6
+                className="my-2"
+                style={{ color: "#8B1C27", fontWeight: "600", fontSize: "1rem" }}
+              >
                 {card.title}
               </h6>
-              <p style={{ fontSize: "0.95rem" }}>{card.text}</p>
+              <p
+                style={{
+                  fontSize: "0.9rem",
+                  flexGrow: 1,
+                  marginBottom: "10px",
+                }}
+              >
+                {card.text}
+              </p>
               <button
                 className="btn"
                 style={{
                   backgroundColor: "#8B1C27",
                   color: "white",
                   borderRadius: "30px",
-                  fontSize: "0.95rem", // levemente maior
-                  padding: "8px 16px",
+                  fontSize: "0.9rem",
+                  padding: "6px 12px",
+                  width: "100%",
+                  maxWidth: "160px",
                 }}
               >
                 {card.btn}

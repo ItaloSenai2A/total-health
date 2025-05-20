@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes} from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import "./App.css";
@@ -59,11 +59,20 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />
-              <Route path="/usuario" element={<LoginCadastro onLogin={handleLogin} />} />
-<Route path="/loginCadastro" element={<LoginCadastro onLogin={handleLogin} />} />
+              <Route
+                path="/usuario"
+                element={<LoginCadastro onLogin={handleLogin} />}
+              />
+              <Route
+                path="/loginCadastro"
+                element={<LoginCadastro onLogin={handleLogin} />}
+              />
               <Route path="/prescricao" element={<Prescricao />} />
               <Route path="/pagamento" element={<Pagamento />} />
-              <Route path="/medicoEspecialidades" element={<MedicoEspecialidade />} />
+              <Route
+                path="/medicoEspecialidades"
+                element={<MedicoEspecialidade />}
+              />
               <Route path="/medico" element={<Medico />} />
               <Route path="/exame" element={<Exame />} />
               <Route path="/especialidade" element={<Especialidade />} />
