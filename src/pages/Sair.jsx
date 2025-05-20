@@ -1,94 +1,75 @@
+import React, { useState } from "react";
+import { Button, Modal, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Sair = () => {
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(true);
   const navigate = useNavigate();
 
-  const handleSair = () => {
-    localStorage.clear();
-    navigate("/");
-    window.location.reload();
+  const cores = {
+    fundo: "#F2F2F2",
+    botaoPrincipal: "#8B0000",
+    botaoHover: "#A30000",
+    botaoAtivo: "#C0392B",
+    texto: "#1C1C1C",
   };
 
-  const handleCancelar = () => {
-    navigate(-1);
+  const confirmarSaida = () => {
+    localStorage.clear();         // remove todos os dados do usuário
+    navigate("/");                // vai para a home
+    window.location.reload();     // recarrega a página para atualizar Topbar
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        width: "100%",
-        backgroundColor: "#F2F2F2", // fundo neutro claro
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "Roboto, sans-serif",
-      }}
+    <div>
+    <Container
+      className="d-flex justify-content-center align-items-center"
+      style={{ height: "100vh", backgroundColor: cores.fundo }}
     >
-      <div
-        style={{
-          backgroundColor: "#FFFFFF", // fundo do card
-          padding: "40px",
-          borderRadius: "16px",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-          maxWidth: "500px",
-          width: "90%",
-          textAlign: "center",
-        }}
+      <Modal
+        show={mostrarConfirmacao}
+        onHide={() => setMostrarConfirmacao(false)}
+        centered
+        backdrop="static"
+        keyboard={false}
       >
-        <h2 style={{ color: "#1C1C1C", marginBottom: "20px" }}>
-          Deseja realmente sair?
-        </h2>
-        <p style={{ color: "#3A3A3A", marginBottom: "30px" }}>
-          Ao sair da sua conta, você será desconectado e perderá qualquer informação não salva.
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
-          <button
-            onClick={handleCancelar}
+        <Modal.Header
+          style={{
+            backgroundColor: cores.botaoPrincipal,
+            color: "#fff",
+            justifyContent: "space-between",
+          }}
+        >
+          <Modal.Title>Confirmação de saída</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p
             style={{
-              padding: "12px 24px",
-              border: "2px solid #8B0000",
-              backgroundColor: "#FFF5E1", // bege claro
-              color: "#8B0000",
-              borderRadius: "30px",
-              fontWeight: "500",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#F9E6E6";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#FFF5E1";
+              fontSize: "1.1rem",
+              color: cores.texto,
+              textAlign: "left", // Alinha o texto mais à direita
+              marginBottom: "0",
             }}
           >
+            Tem certeza que deseja sair?
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => navigate(-1)}>
             Cancelar
-          </button>
-
-          <button
-            onClick={handleSair}
+          </Button>
+          <Button
             style={{
-              padding: "12px 24px",
-              backgroundColor: "#8B0000", // vermelho escuro
-              color: "#FFFFFF",
+              backgroundColor: cores.botaoAtivo,
               border: "none",
-              borderRadius: "30px",
-              fontWeight: "500",
-              cursor: "pointer",
-              transition: "background 0.3s ease",
             }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#A30000";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#8B0000";
-            }}
+            onClick={confirmarSaida}
           >
-            Sim, sair
-          </button>
-        </div>
-      </div>
+            Sair
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </Container>
     </div>
   );
 };
