@@ -18,8 +18,13 @@ function LoginCadastro({ onLogin }) {
     }
     const cadastro = { nome, email, senha };
     localStorage.setItem("usuario", JSON.stringify(cadastro));
-    if (onLogin) onLogin(cadastro);
-    navigate("/");
+
+    // Após cadastro, direciona para o modo login
+    setModoCadastro(false);
+    setErro("");
+    setNome("");
+    setEmail("");
+    setSenha("");
   };
 
   const handleSubmitLogin = (e) => {
@@ -42,7 +47,7 @@ function LoginCadastro({ onLogin }) {
       className="d-flex justify-content-center align-items-center"
       style={{
         minHeight: "100vh",
-        backgroundColor: "#FFF5E1",
+        backgroundColor: "#F2F2F2",
         padding: "20px",
       }}
     >
