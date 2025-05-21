@@ -16,7 +16,7 @@ const perguntasERespostas = [
       {
         pergunta: "Como editar meu perfil médico?",
         resposta:
-          "Acesse 'Perfil do Médico' no menu lateral e clique em 'Editar dados'.",
+          "Acesse 'Gerenciar Perfil' clicando no seu avatar, e selecione 'Editar Perfil'.",
       },
       {
         pergunta: "Como acessar os prontuários?",
