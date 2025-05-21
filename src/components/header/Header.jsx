@@ -52,7 +52,11 @@ const Header = (props) => {
         </li>
       </ul>
 
-      <div className="mt-auto p-4">
+      {/* Rodapé fixado ao final da barra lateral */}
+      <div
+        className="mt-auto p-4"
+        style={{ backgroundColor: "#660000" }}
+      >
         <a className="nav-link text-white" href="/sair">Sair</a>
         <p className="mt-3">Linha direta de emergência</p>
         <p className="fw-bold">+91 - 999 999 9999</p>
