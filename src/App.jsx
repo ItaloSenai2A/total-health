@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import "./App.css";
@@ -10,7 +10,7 @@ import Logo from "./assets/LogotipoTotalHealth-Photoroom.png";
 import LogoMobile from "./assets/LogotipoTotalHealth-Mobile.png";
 import HeaderMobile from "./components/header/HeaderMobile";
 import TopBar from "./components/header/TopBar";
-import RotaPrivada from "./components/RotaPrivada"; // IMPORTANTE
+import RotaPrivada from "./components/RotaPrivada";
 
 // Páginas
 import Sobre from "./pages/Sobre";
