@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const Header = (props) => {
   return (
@@ -8,12 +8,14 @@ const Header = (props) => {
     >
       {/* Logo grudado no topo, alinhado ao centro com mesmo padding lateral */}
       <div style={{ padding: "16px" }}>
-        <img
-          src={props.Logo}
-          alt="TotalHealth Logo"
-          className="img-fluid"
-          style={{ maxWidth: "200px", display: "block", margin: "0 auto" }}
-        />
+        <Link to="/">
+          <img
+            src={props.Logo}
+            alt="TotalHealth Logo"
+            className="img-fluid"
+            style={{ maxWidth: "200px", display: "block", margin: "0 auto" }}
+          />
+        </Link>
       </div>
 
       {/* Menu com mesmo padding lateral */}
