@@ -31,6 +31,8 @@ import Perfil from "./pages/Perfil";
 import Home from "./pages/Home";
 import Usuario from "./pages/Usuario";
 
+import ChatBot from "./chatbot/ChatBot";
+
 function App() {
   const [usuario, setUsuario] = useState(
     JSON.parse(localStorage.getItem("usuario")) || null
@@ -57,7 +59,10 @@ function App() {
           <TopBar usuario={usuario} />
           <main className="p-4">
             <Routes>
-              <Route path="/loginCadastro" element={<LoginCadastro onLogin={handleLogin} />} />
+              <Route
+                path="/loginCadastro"
+                element={<LoginCadastro onLogin={handleLogin} />}
+              />
 
               <Route
                 path="/"
@@ -184,6 +189,10 @@ function App() {
           </main>
         </div>
       </div>
+
+      {/* Chat fixo em todas as páginas */}
+      <ChatBot />
+
       <Footer />
     </BrowserRouter>
   );
