@@ -1,7 +1,28 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 
 const TopBar = ({ usuario }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [menuAberto, setMenuAberto] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickFora = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuAberto(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickFora);
+    return () => {
+      document.removeEventListener("mousedown", handleClickFora);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    setMenuAberto(false);
+    navigate("/sair"); // Navega para a página de confirmação de logout
+  };
 
   const routeNames = {
     "/": "Home",
@@ -16,51 +37,102 @@ const TopBar = ({ usuario }) => {
     "/contato": "Contato",
     "/consulta": "Consultas",
     "/agendamento": "Agendamentos",
+    "/novoPaciente": "Novo Paciente",
     "/perfil": "Perfil",
-    "/sobre": "Sobre"
+    "/logout": "Sair",
   };
 
   const titulo = routeNames[location.pathname] || "Home";
 
   return (
     <div
-      className="d-flex justify-content-between align-items-center px-4 py-3 mb-3"
+      className="d-flex justify-content-between align-items-center px-4 py-3 mb-3 position-relative"
       style={{
-        backgroundColor: "#ffffff",
-        borderBottom: "2px solid #8b1a2b",
+        backgroundColor: "#FFFFFF",
+        borderBottom: "2px solid #8B0000",
         borderRadius: "8px",
-        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
+        color: "#1C1C1C",
       }}
     >
-      <h4 className="m-0 fw-bold" style={{ color: "#8b1a2b" }}>
+      <h4 className="m-0 fw-bold" style={{ color: "#8B0000" }}>
         {titulo}
       </h4>
 
-      <div className="d-flex align-items-center gap-3">
+      <div className="d-flex align-items-center gap-3 position-relative">
         {usuario ? (
           <>
             <span
               className="d-none d-md-inline"
-              style={{ color: "#333", fontWeight: "500" }}
+              style={{ color: "#3A3A3A", fontWeight: "500" }}
             >
               Olá, {usuario.nome.split(" ")[0]}!
             </span>
             <img
-              src={`https://ui-avatars.com/api/?name=${usuario.nome}&background=8b1a2b&color=ffffff`}
+              src={`https://ui-avatars.com/api/?name=${usuario.nome}&background=8B0000&color=ffffff`}
               alt={usuario.nome}
               className="rounded-circle border border-2"
               width="42"
               height="42"
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: "cover", cursor: "pointer" }}
+              onClick={() => setMenuAberto(!menuAberto)}
             />
+            {menuAberto && (
+              <div
+                ref={menuRef}
+                className="position-absolute"
+                style={{
+                  top: "60px",
+                  right: "0",
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #8B0000",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                  zIndex: 1000,
+                  minWidth: "200px",
+                }}
+              >
+                <button
+                  className="w-100 text-start px-4 py-3"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#1C1C1C",
+                    fontWeight: "500",
+                    fontSize: "15px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setMenuAberto(false);
+                    navigate("/perfil");
+                  }}
+                >
+                  👤 Gerenciar Perfil
+                </button>
+                <button
+                  className="w-100 text-start px-4 py-3"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#C0392B",
+                    fontWeight: "500",
+                    fontSize: "15px",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleLogout}
+                >
+                  🚪 Sair
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <a
             href="/loginCadastro"
             className="btn"
             style={{
-              border: "2px solid #8b1a2b",
-              color: "#8b1a2b",
+              border: "2px solid #8B0000",
+              color: "#8B0000",
               fontWeight: "600",
               borderRadius: "8px",
               padding: "8px 16px",
@@ -68,12 +140,12 @@ const TopBar = ({ usuario }) => {
               backgroundColor: "transparent",
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#8b1a2b";
-              e.target.style.color = "#ffffff";
+              e.target.style.backgroundColor = "#FFFFFF";
+              e.target.style.color = "#8B0000";
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = "transparent";
-              e.target.style.color = "#8b1a2b";
+              e.target.style.color = "#8B0000";
             }}
           >
             Cadastrar-se / Login
