@@ -16,8 +16,8 @@ const TopBar = ({ usuario }) => {
     "/contato": "Contato",
     "/consulta": "Consultas",
     "/agendamento": "Agendamentos",
-    "/novoPaciente": "Novo Paciente",
-    "/perfil": "Perfil"
+    "/perfil": "Perfil",
+    "/sobre": "Sobre"
   };
 
   const titulo = routeNames[location.pathname] || "Home";

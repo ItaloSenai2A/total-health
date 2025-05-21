@@ -26,7 +26,6 @@ import Consulta from "./pages/Consulta";
 import Agendamento from "./pages/Agendamento";
 import Sair from "./pages/Sair";
 import NaoEncontrado from "./pages/NaoEncontrado";
-import NovaConsulta from "./pages/NovaConsulta";
 import Perfil from "./pages/Perfil";
 import Home from "./pages/Home";
 import Usuario from "./pages/Usuario";
@@ -152,14 +151,6 @@ function App() {
                 element={
                   <RotaPrivada usuario={usuario}>
                     <Agendamento />
-                  </RotaPrivada>
-                }
-              />
-              <Route
-                path="/consulta/nova"
-                element={
-                  <RotaPrivada usuario={usuario}>
-                    <NovaConsulta />
                   </RotaPrivada>
                 }
               />

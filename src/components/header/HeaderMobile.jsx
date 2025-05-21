@@ -82,6 +82,11 @@ const HeaderMobile = (props) => {
                   Agendamentos
                 </a>
               </li>
+              <li className="nav-item">
+                <a className="nav-link text-white" href="/sobre">
+                  Sobre
+                </a>
+              </li>
             </ul>
             <div className="mt-4 ">
               <Link className="nav-link text-white" to="/sair">
