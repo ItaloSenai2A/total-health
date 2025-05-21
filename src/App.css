@@ -18,6 +18,7 @@ main {
 }
 
 .logoMobile {
-  filter: invert(1);
-  mix-blend-mode: screen;
+  height: 100px; /* Aumente conforme necessário */
+  width: auto; /* Mantém a proporção */
 }
+
