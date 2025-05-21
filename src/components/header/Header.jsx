@@ -50,6 +50,9 @@ const Header = (props) => {
         <li className="nav-item">
           <a className="nav-link text-white" href="/agendamento">Agendamentos</a>
         </li>
+        <li className="nav-item">
+          <a className="nav-link text-white" href="/sobre">Sobre</a>
+        </li>
       </ul>
 
       {/* Rodapé fixado ao final da barra lateral */}
