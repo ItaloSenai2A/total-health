@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Header = (props) => {
   return (
     <div
-      className="d-none d-md-flex flex-column col-3 text-white vh-100"
+      className="d-none d-md-flex flex-column col-3 text-white min-vh-100"
       style={{ backgroundColor: "#8B0000", padding: 0 }}
     >
       {/* Logo grudado no topo, alinhado ao centro com mesmo padding lateral */}
