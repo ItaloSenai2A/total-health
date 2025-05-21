@@ -1,19 +1,21 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const Header = (props) => {
   return (
     <div
-      className="d-none d-md-flex flex-column col-3 text-white vh-100"
+      className="d-none d-md-flex flex-column col-3 text-white min-vh-100"
       style={{ backgroundColor: "#8B0000", padding: 0 }}
     >
       {/* Logo grudado no topo, alinhado ao centro com mesmo padding lateral */}
       <div style={{ padding: "16px" }}>
-        <img
-          src={props.Logo}
-          alt="TotalHealth Logo"
-          className="img-fluid"
-          style={{ maxWidth: "200px", display: "block", margin: "0 auto" }}
-        />
+        <Link to="/">
+          <img
+            src={props.Logo}
+            alt="TotalHealth Logo"
+            className="img-fluid"
+            style={{ maxWidth: "200px", display: "block", margin: "0 auto" }}
+          />
+        </Link>
       </div>
 
       {/* Menu com mesmo padding lateral */}
@@ -48,13 +50,14 @@ const Header = (props) => {
         <li className="nav-item">
           <a className="nav-link text-white" href="/agendamento">Agendamentos</a>
         </li>
+        <li className="nav-item">
+          <a className="nav-link text-white" href="/sobre">Sobre</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link text-white" href="/sair">Sair</a>
+        </li>
       </ul>
 
-      <div className="mt-auto p-4">
-        <a className="nav-link text-white" href="/sair">Sair</a>
-        <p className="mt-3">Linha direta de emergência</p>
-        <p className="fw-bold">+91 - 999 999 9999</p>
-      </div>
     </div>
   );
 };

@@ -105,9 +105,7 @@ const HeaderMobile = () => {
           <Link className="nav-link text-white" to="/sair">
             Sair
           </Link>
-          <hr className="w-100 bg-white text-white" />
-          <p className="mt-3 text-white">Linha direta de emergência</p>
-          <p className="fw-bold text-white">+91 - 999 999 9999</p>
+          
         </div>
       </div>
     </nav>

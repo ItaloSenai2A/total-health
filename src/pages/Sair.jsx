@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Sair = () => {
-  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(true);
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
   const navigate = useNavigate();
 
   const cores = {
@@ -14,14 +14,25 @@ const Sair = () => {
     texto: "#1C1C1C",
   };
 
+  useEffect(() => {
+    // Verifica se o usuário está logado (exemplo: localStorage tem algo que identifique o login)
+    const usuarioLogado = localStorage.getItem("usuario"); // ou a chave que você usa pra identificar login
+    if (!usuarioLogado) {
+      // se não tiver, já vai direto pra home sem mostrar nada
+      navigate("/");
+    } else {
+      // se tiver logado, mostra o modal de confirmação
+      setMostrarConfirmacao(true);
+    }
+  }, [navigate]);
+
   const confirmarSaida = () => {
-    localStorage.clear();         // remove todos os dados do usuário
-    navigate("/");                // vai para a home
-    window.location.reload();     // recarrega a página para atualizar Topbar
+    localStorage.clear();
+    navigate("/");
+    window.location.reload();
   };
 
   return (
-    <div>
     <Container
       className="d-flex justify-content-center align-items-center"
       style={{ height: "100vh", backgroundColor: cores.fundo }}
@@ -47,7 +58,7 @@ const Sair = () => {
             style={{
               fontSize: "1.1rem",
               color: cores.texto,
-              textAlign: "left", // Alinha o texto mais à direita
+              textAlign: "left",
               marginBottom: "0",
             }}
           >
@@ -70,7 +81,6 @@ const Sair = () => {
         </Modal.Footer>
       </Modal>
     </Container>
-    </div>
   );
 };
 
