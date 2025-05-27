@@ -55,19 +55,19 @@ function LoginCadastro({ onLogin }) {
 
   return (
     <div
-      className="d-flex justify-content-center"
+      className="d-flex justify-content-center align-items-center"
       style={{
         minHeight: "100vh",
         backgroundColor: cores.fundo,
-        paddingTop: "60px",
+        padding: "20px",
       }}
     >
       <div
         className="card shadow p-4"
         style={{
+          width: "90%",
           maxWidth: "450px",
-          width: "50%",
-          maxHeight: "500px",
+          minWidth: "280px",
           backgroundColor: "#ffffff",
           border: `2px solid ${cores.borda}`,
           borderRadius: "20px",
