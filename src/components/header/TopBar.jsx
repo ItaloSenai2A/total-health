@@ -66,7 +66,7 @@ const TopBar = ({ usuario }) => {
               className="d-none d-md-inline"
               style={{ color: "#3A3A3A", fontWeight: "500" }}
             >
-              Olá, {usuario.nome.split(" ")[0]}!
+              Olá, {usuario?.nome ? usuario.nome.split(" ")[0] : "Usuário"}!
             </span>
             <img
               src={`https://ui-avatars.com/api/?name=${usuario.nome}&background=8B0000&color=ffffff`}

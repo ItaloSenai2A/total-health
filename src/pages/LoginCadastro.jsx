@@ -1,4 +1,3 @@
-// pages/LoginCadastro.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -18,38 +17,135 @@ function LoginCadastro({ onLogin }) {
     borda: "#D4AF37",
   };
 
-  const handleSubmitCadastro = (e) => {
+  const handleSubmitCadastro = async (e) => {
     e.preventDefault();
-    if (!nome || !email || !senha) {
+    if (!nome.trim() || !email.trim() || !senha.trim()) {
       setErro("Preencha todos os campos.");
       return;
     }
 
-    const avatarAleatorio = `https://api.dicebear.com/6.x/bottts/svg?seed=${nome}`;
-    const cadastro = { nome, email, senha, avatar: avatarAleatorio };
-    localStorage.setItem("usuario", JSON.stringify(cadastro));
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErro("E-mail inválido.");
+      return;
+    }
 
-    setModoCadastro(false);
-    setErro("");
-    setNome("");
-    setEmail("");
-    setSenha("");
+    if (senha.length < 6) {
+      setErro("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
+    try {
+      console.log("Enviando dados:", { nome, email, password: senha });
+      const response = await fetch("http://localhost:5268/Users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: nome,
+          email: email,
+          password: senha,
+        }),
+      });
+
+      console.log("Resposta do servidor:", response);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erro no cadastro:", errorData);
+
+        if (errorData.errors && errorData.errors.DuplicateUserName) {
+          setErro("E-mail já cadastrado. Tente outro e-mail.");
+        } else {
+          setErro(errorData.title || "Erro ao cadastrar.");
+        }
+        return;
+      }
+
+      setModoCadastro(false);
+      setErro("");
+      setNome("");
+      setEmail("");
+      setSenha("");
+      alert("Cadastro realizado com sucesso! Faça login para continuar.");
+    } catch (error) {
+      console.error("Erro ao conectar com o servidor:", error);
+      setErro("Erro ao conectar com o servidor.");
+    }
   };
 
-  const handleSubmitLogin = (e) => {
+  const handleSubmitLogin = async (e) => {
     e.preventDefault();
-    if (!email || !senha) {
+    if (!email.trim() || !senha.trim()) {
       setErro("Preencha e-mail e senha.");
       return;
     }
 
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (usuario?.email === email && usuario?.senha === senha) {
-      if (onLogin) onLogin(usuario);
-      navigate("/");
-      window.location.reload();
-    } else {
-      setErro("E-mail ou senha incorretos.");
+    try {
+      console.log("Enviando dados de login:", { email, password: senha });
+      const response = await fetch(
+        "http://localhost:5268/Users/login?useCookies=false&useSessionCookies=false",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: senha,
+          }),
+        }
+      );
+
+      console.log("Resposta do servidor:", response);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erro no login:", errorData);
+        setErro(errorData.message || "E-mail ou senha incorretos.");
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token || data);
+
+      if (onLogin) onLogin({ email });
+
+      // Verificando se o perfil do usuário existe
+      const profileResponse = await fetch(
+        `http://localhost:5268/api/UsuariosLogin/${email}`,
+        {
+          method: "GET",
+          headers: {
+            accept: "text/plain",
+            Authorization: `Bearer ${data.token}`,
+          },
+        }
+      );
+
+      if (profileResponse.status === 204) {
+        navigate("/perfil"); // Redireciona para a página de edição de perfil
+      }
+
+      if (!profileResponse.ok) {
+        throw new Error("Erro ao verificar o perfil do usuário");
+      }
+
+      if (profileResponse.ok) {
+        const profileData = await profileResponse.json();
+        console.log("Perfil do usuário encontrado:", profileData);
+        localStorage.setItem("usuario", JSON.stringify(profileData));
+        navigate("/"); // Redireciona para a página principal
+      }
+      
+     
+
+      /*****/
+    } catch (error) {
+      console.error("Erro ao conectar com o servidor:", error);
+      setErro("Erro ao conectar com o servidor.");
     }
   };
 
@@ -85,7 +181,9 @@ function LoginCadastro({ onLogin }) {
           {modoCadastro ? "Crie sua conta" : "Bem-vindo de volta"}
         </h2>
 
-        <form onSubmit={modoCadastro ? handleSubmitCadastro : handleSubmitLogin}>
+        <form
+          onSubmit={modoCadastro ? handleSubmitCadastro : handleSubmitLogin}
+        >
           {modoCadastro && (
             <div className="mb-3">
               <label className="form-label" style={{ fontWeight: "500" }}>
@@ -147,8 +245,12 @@ function LoginCadastro({ onLogin }) {
               padding: "10px 0",
               transition: "0.3s",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = cores.hover)}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = cores.destaque)}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = cores.hover)
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = cores.destaque)
+            }
           >
             {modoCadastro ? "Cadastrar" : "Entrar"}
           </button>
