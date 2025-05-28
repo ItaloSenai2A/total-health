@@ -126,7 +126,7 @@ function LoginCadastro({ onLogin }) {
       );
 
       if (profileResponse.status === 204) {
-        navigate("/perfil"); // Redireciona para a página de edição de perfil
+        navigate("/usuarioLogin"); // Redireciona para a página de edição de perfil
       }
 
       if (!profileResponse.ok) {

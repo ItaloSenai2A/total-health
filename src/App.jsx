@@ -29,6 +29,7 @@ import NaoEncontrado from "./pages/NaoEncontrado";
 import Perfil from "./pages/Perfil";
 import Home from "./pages/Home";
 import Usuario from "./pages/Usuario";
+import UsuarioLogin from "./pages/UsuarioLogin";
 
 import ChatBot from "./chatbot/ChatBot";
 
@@ -62,6 +63,8 @@ function App() {
                 path="/loginCadastro"
                 element={<LoginCadastro onLogin={handleLogin} />}
               />
+
+<Route path ="/usuarioLogin" element={<UsuarioLogin onLogin={handleLogin} />} />
 
               <Route
                 path="/"

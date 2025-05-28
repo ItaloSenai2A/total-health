@@ -6,106 +6,148 @@ const Usuario = () => {
   const [showModal, setShowModal] = useState(false);
   const [editarUsuario, setEditarUsuario] = useState(null);
 
-  // Estado para o formulário de usuário
   const [novoUsuario, setNovoUsuario] = useState({
-    Nome: "",
-    Email: "",
-    Senha: "",
-    Telefone: "",
-    Cpf: "",
-    Genero: "",
-    TipoSanguineo: "",
-    Endereco: "",
+    nome: "",
+    email: "",
+    senha: "",
+    telefone: "",
+    cpf: "",
+    genero: "",
+    tipoSanguineo: "",
+    endereco: "",
   });
 
-  // Carrega usuários do localStorage no carregamento
+  const token = localStorage.getItem('token'); // Recupera o token armazenado
+
+  // Carrega usuários da API no carregamento
   useEffect(() => {
-    const dadosSalvos = localStorage.getItem("totalhealth_usuarios");
-    if (dadosSalvos) {
-      setUsuarios(JSON.parse(dadosSalvos));
-    }
-  }, []);
+    const carregarUsuarios = async () => {
+      try {
+        const response = await fetch("http://localhost:5268/api/Usuarios", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
 
-  // Salva usuários no localStorage
-  const salvarUsuarios = (lista) => {
-    localStorage.setItem("totalhealth_usuarios", JSON.stringify(lista));
-  };
+        if (!response.ok) {
+          throw new Error('Erro ao carregar usuários');
+        }
 
-  // Handle para atualizar os campos do formulário
+        const dados = await response.json();
+        setUsuarios(dados);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    carregarUsuarios();
+  }, [token]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNovoUsuario((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validação simples
   const validarCampos = () => {
-    if (!novoUsuario.Nome.trim() || !novoUsuario.Telefone.trim() || !novoUsuario.Cpf.trim()) {
+    if (!novoUsuario.nome.trim() || !novoUsuario.telefone.trim() || !novoUsuario.cpf.trim()) {
       alert("Nome, Telefone e CPF são obrigatórios.");
       return false;
     }
     return true;
   };
 
-  // Abrir modal para novo usuário
   const abrirModalNovo = () => {
     setEditarUsuario(null);
     setNovoUsuario({
-      Nome: "",
-      Email: "",
-      Senha: "",
-      Telefone: "",
-      Cpf: "",
-      Genero: "",
-      TipoSanguineo: "",
-      Endereco: "",
+      nome: "",
+      email: "",
+      senha: "",
+      telefone: "",
+      cpf: "",
+      genero: "",
+      tipoSanguineo: "",
+      endereco: "",
     });
     setShowModal(true);
   };
 
-  // Abrir modal para editar usuário existente
   const abrirModalEditar = (usuario) => {
-    setEditarUsuario(usuario.UsuarioId);
+    if (!usuario) return;
+    setEditarUsuario(usuario.usuarioId || null);
     setNovoUsuario({ ...usuario });
     setShowModal(true);
   };
 
-  // Adicionar ou editar usuário
-  const handleAddEditarUsuario = () => {
+  const handleAddEditarUsuario = async () => {
     if (!validarCampos()) return;
 
-    if (editarUsuario) {
-      // Editar
-      const listaAtualizada = usuarios.map((u) =>
-        u.UsuarioId === editarUsuario ? { ...novoUsuario, UsuarioId: editarUsuario } : u
-      );
-      setUsuarios(listaAtualizada);
-      salvarUsuarios(listaAtualizada);
-    } else {
-      // Adicionar novo
-      const usuarioComId = {
-        ...novoUsuario,
-        UsuarioId: Date.now(),
-      };
-      const novaLista = [...usuarios, usuarioComId];
+    try {
+      let response;
+
+      const url = editarUsuario
+        ? `http://localhost:5268/api/Usuarios/${editarUsuario}`
+        : "http://localhost:5268/api/Usuarios";
+
+      const method = editarUsuario ? "PUT" : "POST";
+
+      response = await fetch(url, {
+        method,
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(novoUsuario)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.statusText}`);
+      }
+
+      const usuarioSalvo = await response.json();
+
+      let novaLista;
+      if (editarUsuario) {
+        novaLista = usuarios.map((u) =>
+          u.usuarioId === editarUsuario ? usuarioSalvo : u
+        );
+      } else {
+        novaLista = [...usuarios, usuarioSalvo];
+      }
+
       setUsuarios(novaLista);
-      salvarUsuarios(novaLista);
+      setShowModal(false);
+      setEditarUsuario(null);
+    } catch (error) {
+      alert("Erro ao salvar usuário: " + error.message);
     }
-
-    setShowModal(false);
   };
 
-  // Excluir usuário
-  const handleExcluir = (id) => {
+  const handleExcluir = async (id) => {
     if (window.confirm("Tem certeza que deseja excluir este usuário?")) {
-      const listaFiltrada = usuarios.filter((u) => u.UsuarioId !== id);
-      setUsuarios(listaFiltrada);
-      salvarUsuarios(listaFiltrada);
+      try {
+        const response = await fetch(`http://localhost:5268/api/Usuarios/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao excluir usuário');
+        }
+
+        const listaFiltrada = usuarios.filter((u) => u.usuarioId !== id);
+        setUsuarios(listaFiltrada);
+      } catch (error) {
+        alert("Erro ao excluir usuário: " + error.message);
+      }
     }
   };
 
-  // Paleta de cores
   const cores = {
-    fundoTela: "#F2F2F2", // alterei para não ficar bege/amarelado
+    fundoTela: "#F2F2F2",
     botaoPrincipal: "#8B0000",
     botaoHover: "#A30000",
     botaoAtivo: "#C0392B",
@@ -124,7 +166,6 @@ const Usuario = () => {
         Gerenciar Usuários
       </h2>
 
-      {/* Card para adicionar novo usuário */}
       <Card
         className="mb-4"
         onClick={abrirModalNovo}
@@ -141,78 +182,77 @@ const Usuario = () => {
         </Card.Body>
       </Card>
 
-      {/* Modal formulário maior */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
         centered
         backdrop="static"
         keyboard={false}
-        size="lg" // tamanho maior do modal
+        size="lg"
       >
         <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
           <Modal.Title>{editarUsuario ? "Editar Usuário" : "Adicionar Novo Usuário"}</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
           <Form>
-            <Form.Group className="mb-3" controlId="formNome">
+            <Form.Group className="mb-3">
               <Form.Label>Nome *</Form.Label>
               <Form.Control
                 type="text"
-                name="Nome"
-                value={novoUsuario.Nome}
+                name="nome"
+                value={novoUsuario.nome}
                 onChange={handleChange}
                 placeholder="Digite o nome completo"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formEmail">
+            <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                name="Email"
-                value={novoUsuario.Email}
+                name="email"
+                value={novoUsuario.email}
                 onChange={handleChange}
                 placeholder="Digite o email"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formSenha">
+            <Form.Group className="mb-3">
               <Form.Label>Senha</Form.Label>
               <Form.Control
                 type="password"
-                name="Senha"
-                value={novoUsuario.Senha}
+                name="senha"
+                value={novoUsuario.senha}
                 onChange={handleChange}
                 placeholder="Digite a senha"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formTelefone">
+            <Form.Group className="mb-3">
               <Form.Label>Telefone *</Form.Label>
               <Form.Control
                 type="text"
-                name="Telefone"
-                value={novoUsuario.Telefone}
+                name="telefone"
+                value={novoUsuario.telefone}
                 onChange={handleChange}
                 placeholder="(xx) xxxx-xxxx"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formCpf">
+            <Form.Group className="mb-3">
               <Form.Label>CPF *</Form.Label>
               <Form.Control
                 type="text"
-                name="Cpf"
-                value={novoUsuario.Cpf}
+                name="cpf"
+                value={novoUsuario.cpf}
                 onChange={handleChange}
                 placeholder="000.000.000-00"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formGenero">
+            <Form.Group className="mb-3">
               <Form.Label>Gênero</Form.Label>
-              <Form.Select name="Genero" value={novoUsuario.Genero} onChange={handleChange}>
+              <Form.Select name="genero" value={novoUsuario.genero} onChange={handleChange}>
                 <option value="">Selecione</option>
                 <option value="Feminino">Feminino</option>
                 <option value="Masculino">Masculino</option>
@@ -221,11 +261,11 @@ const Usuario = () => {
               </Form.Select>
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formTipoSanguineo">
+            <Form.Group className="mb-3">
               <Form.Label>Tipo Sanguíneo</Form.Label>
               <Form.Select
-                name="TipoSanguineo"
-                value={novoUsuario.TipoSanguineo}
+                name="tipoSanguineo"
+                value={novoUsuario.tipoSanguineo}
                 onChange={handleChange}
               >
                 <option value="">Selecione</option>
@@ -240,84 +280,69 @@ const Usuario = () => {
               </Form.Select>
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formEndereco">
+            <Form.Group className="mb-3">
               <Form.Label>Endereço</Form.Label>
               <Form.Control
                 type="text"
-                name="Endereco"
-                value={novoUsuario.Endereco}
+                name="endereco"
+                value={novoUsuario.endereco}
                 onChange={handleChange}
                 placeholder="Digite o endereço"
               />
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: cores.botaoPrincipal }}>
+        <Modal.Footer style={{ backgroundColor: cores.fundoCard }}>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
           <Button
-            style={{ backgroundColor: cores.botaoAtivo, border: "none" }}
+            style={{
+              backgroundColor: cores.botaoPrincipal,
+              borderColor: cores.bordaDourada,
+              fontWeight: "600",
+            }}
             onClick={handleAddEditarUsuario}
           >
-            {editarUsuario ? "Salvar Alterações" : "Salvar"}
+            {editarUsuario ? "Salvar Alterações" : "Adicionar Usuário"}
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Lista de usuários */}
       <Row>
-        {usuarios.length === 0 ? (
-          <p className="text-center" style={{ color: cores.textoSecundario, width: "100%" }}>
-            Nenhum usuário cadastrado.
-          </p>
-        ) : (
-          usuarios.map((usuario) => (
-            <Col md={4} lg={3} sm={6} key={usuario.UsuarioId} className="mb-4">
-              <Card
-                style={{
-                  backgroundColor: cores.fundoCard,
-                  border: `2px solid ${cores.bordaDourada}`,
-                  color: cores.textoTitulo,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  height: "100%",
-                }}
-              >
-                <Card.Body>
-                  <Card.Title style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
-                    {usuario.Nome}
-                  </Card.Title>
-                  <Card.Text>
-                    <strong>Email:</strong> {usuario.Email || "-"} <br />
-                    <strong>Telefone:</strong> {usuario.Telefone} <br />
-                    <strong>CPF:</strong> {usuario.Cpf} <br />
-                    <strong>Gênero:</strong> {usuario.Genero || "-"} <br />
-                    <strong>Tipo Sanguíneo:</strong> {usuario.TipoSanguineo || "-"} <br />
-                    <strong>Endereço:</strong> {usuario.Endereco || "-"}
-                  </Card.Text>
-                </Card.Body>
-                <Card.Footer className="d-flex justify-content-between">
-                  <Button
-                    variant="outline-primary"
-                    onClick={() => abrirModalEditar(usuario)}
-                    style={{ borderColor: cores.botaoPrincipal, color: cores.botaoPrincipal }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    onClick={() => handleExcluir(usuario.UsuarioId)}
-                    style={{ borderColor: cores.botaoAtivo, color: cores.botaoAtivo }}
-                  >
-                    Excluir
-                  </Button>
-                </Card.Footer>
-              </Card>
-            </Col>
-          ))
-        )}
+        {usuarios.map((usuario) => (
+          <Col md={4} key={usuario.usuarioId} className="mb-3">
+            <Card
+              style={{
+                backgroundColor: cores.fundoCard,
+                border: `1px solid ${cores.bordaDourada}`,
+                padding: "10px"
+              }}
+            >
+              <Card.Body>
+                <Card.Title style={{ color: cores.textoTitulo }}>{usuario.nome}</Card.Title>
+                <Card.Text style={{ color: cores.textoSecundario }}>
+                  Email: {usuario.email} <br />
+                  Telefone: {usuario.telefone} <br />
+                  CPF: {usuario.cpf}
+                </Card.Text>
+                <Button
+                  variant="warning"
+                  className="me-2"
+                  onClick={() => abrirModalEditar(usuario)}
+                >
+                  Editar
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => handleExcluir(usuario.usuarioId)}
+                >
+                  Excluir
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
       </Row>
     </div>
   );
