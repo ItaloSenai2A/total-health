@@ -19,10 +19,11 @@ const UsuarioLogin = ({ onLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:5174/api/UsuariosLogin", {
+    fetch("http://localhost:5268/api/UsuariosLogin", {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain",
+        accept: "text/plain",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify(usuarioLogin),
