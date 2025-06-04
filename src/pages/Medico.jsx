@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Form, Modal, Row, Col } from "react-bootstrap";
+import { Card, Button, Form, Modal } from "react-bootstrap";
 
 const Medico = () => {
   const [medicos, setMedicos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editarId, setEditarId] = useState(null);
-
-  // Campos do formulário
   const [nome, setNome] = useState("");
   const [crm, setCrm] = useState("");
 
@@ -21,13 +19,28 @@ const Medico = () => {
     bordaDourada: "#D4AF37",
   };
 
+  const apiBaseUrl = "http://localhost:5268/api/medicos";
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    const dados = localStorage.getItem("totalhealth_medicos");
-    if (dados) setMedicos(JSON.parse(dados));
+    carregarMedicos();
   }, []);
 
-  const salvarMedicos = (lista) => {
-    localStorage.setItem("totalhealth_medicos", JSON.stringify(lista));
+  const carregarMedicos = async () => {
+    try {
+      const response = await fetch(apiBaseUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Erro ao carregar médicos");
+      const data = await response.json();
+      setMedicos(data);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const abrirModalNovo = () => {
@@ -38,9 +51,9 @@ const Medico = () => {
   };
 
   const abrirModalEditar = (medico) => {
-    setEditarId(medico.MedicoId);
-    setNome(medico.Nome);
-    setCrm(medico.Crm);
+    setEditarId(medico.medicoId);
+    setNome(medico.nome);
+    setCrm(medico.crm);
     setShowModal(true);
   };
 
@@ -52,34 +65,52 @@ const Medico = () => {
     return true;
   };
 
-  const salvarMedico = () => {
+  const salvarMedico = async () => {
     if (!validarCampos()) return;
 
-    const novoMedico = {
-      MedicoId: editarId || crypto.randomUUID(),
-      Nome: nome.trim(),
-      Crm: crm.trim(),
-    };
+    const medico = { nome: nome.trim(), crm: crm.trim() };
 
-    let listaAtualizada;
-    if (editarId) {
-      listaAtualizada = medicos.map((m) =>
-        m.MedicoId === editarId ? novoMedico : m
-      );
-    } else {
-      listaAtualizada = [...medicos, novoMedico];
+    try {
+      const url = editarId ? `${apiBaseUrl}/${editarId}` : apiBaseUrl;
+      const method = editarId ? "PUT" : "POST";
+      const body = editarId ? JSON.stringify({ medicoId: editarId, ...medico }) : JSON.stringify(medico);
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: body,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao salvar médico.");
+      }
+
+      setShowModal(false);
+      carregarMedicos();
+    } catch (error) {
+      alert(error.message);
     }
-
-    setMedicos(listaAtualizada);
-    salvarMedicos(listaAtualizada);
-    setShowModal(false);
   };
 
-  const excluirMedico = (id) => {
-    if (window.confirm("Tem certeza que deseja excluir este médico?")) {
-      const listaFiltrada = medicos.filter((m) => m.MedicoId !== id);
-      setMedicos(listaFiltrada);
-      salvarMedicos(listaFiltrada);
+  const excluirMedico = async (id) => {
+    if (!window.confirm("Tem certeza que deseja excluir este médico?")) return;
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Erro ao excluir médico.");
+
+      carregarMedicos();
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -108,93 +139,71 @@ const Medico = () => {
         </Card.Body>
       </Card>
 
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        centered
-        backdrop="static"
-        keyboard={false}
-        size="md"
-      >
+      {medicos.map((medico) => (
+        <Card
+          key={medico.medicoId}
+          className="mb-3"
+          style={{
+            border: `1px solid ${cores.bordaDourada}`,
+            backgroundColor: cores.fundoCard,
+          }}
+        >
+          <Card.Body>
+            <h5 style={{ color: cores.textoTitulo }}>{medico.nome}</h5>
+            <p style={{ color: cores.textoSecundario }}>CRM: {medico.crm}</p>
+            <Button
+              variant="outline-primary"
+              className="me-2"
+              onClick={() => abrirModalEditar(medico)}
+            >
+              Editar
+            </Button>
+            <Button variant="outline-danger" onClick={() => excluirMedico(medico.medicoId)}>
+              Excluir
+            </Button>
+          </Card.Body>
+        </Card>
+      ))}
+
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered backdrop="static">
         <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
           <Modal.Title>{editarId ? "Editar Médico" : "Adicionar Novo Médico"}</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
           <Form>
             <Form.Group controlId="formNome" className="mb-3">
-              <Form.Label>Nome *</Form.Label>
+              <Form.Label>Nome</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Nome completo"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
+                placeholder="Digite o nome"
               />
             </Form.Group>
-
             <Form.Group controlId="formCrm" className="mb-3">
-              <Form.Label>CRM *</Form.Label>
+              <Form.Label>CRM</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Número do CRM"
                 value={crm}
                 onChange={(e) => setCrm(e.target.value)}
+                placeholder="Digite o CRM"
               />
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: cores.botaoPrincipal }}>
+        <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
           <Button
-            style={{ backgroundColor: cores.botaoAtivo, border: "none" }}
+            variant="primary"
+            style={{ backgroundColor: cores.botaoPrincipal, borderColor: cores.bordaDourada }}
             onClick={salvarMedico}
           >
-            {editarId ? "Salvar Alterações" : "Salvar"}
+            Salvar
           </Button>
         </Modal.Footer>
       </Modal>
-
-      <Row>
-        {medicos.length === 0 ? (
-          <p className="text-center" style={{ color: cores.textoSecundario, width: "100%" }}>
-            Nenhum médico cadastrado.
-          </p>
-        ) : (
-          medicos.map((medico) => (
-            <Col md={4} lg={3} sm={6} key={medico.MedicoId} className="mb-4">
-              <Card
-                style={{
-                  backgroundColor: cores.fundoCard,
-                  border: `2px solid ${cores.bordaDourada}`,
-                  cursor: "pointer",
-                  color: cores.textoTitulo,
-                }}
-              >
-                <Card.Body>
-                  <Card.Title style={{ fontWeight: "700" }}>{medico.Nome}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">CRM: {medico.Crm}</Card.Subtitle>
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => abrirModalEditar(medico)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => excluirMedico(medico.MedicoId)}
-                  >
-                    Excluir
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))
-        )}
-      </Row>
     </div>
   );
 };

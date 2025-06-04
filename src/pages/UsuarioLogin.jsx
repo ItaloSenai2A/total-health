@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const UsuarioLogin = ({ onLogin }) => {  // RECEBER onLogin como prop
+const UsuarioLogin = ({ onLogin }) => {
+  // RECEBER onLogin como prop
   const [usuarioLogin, setUsuarioLogin] = useState({
-    cargo: '',
-    username: '',
-    telefone: ''
+    cargo: "",
+    username: "",
+    telefone: "",
   });
 
   const navigate = useNavigate();
@@ -18,35 +19,49 @@ const UsuarioLogin = ({ onLogin }) => {  // RECEBER onLogin como prop
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch('http://localhost:5000/api/UsuarioLogin', {
-      method: 'POST',
+    fetch("http://localhost:5174/api/UsuariosLogin", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        "Content-Type": "text/plain",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify(usuarioLogin)
+      body: JSON.stringify(usuarioLogin),
     })
-      .then(response => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error('Erro ao cadastrar usuário.');
+          throw new Error("Erro ao cadastrar usuário.");
         }
-        return response.json();
-      })
-      .then(data => {
-        alert('Usuário cadastrado com sucesso!');
+
+        const contentType = response.headers.get("content-type");
+        let data = null;
+
+        if (contentType && contentType.includes("application/json")) {
+          data = await response.json();
+        }
+
+        // // Supondo que o token JWT é retornado na resposta
+        // const token = data.token;
+        // if (typeof token === 'string') {
+        //   // Armazene o token no localStorage como uma string
+        //   localStorage.setItem('token', token);
+        // } else {
+        //   console.error('Token JWT não é uma string:', token);
+        // }
+
+        alert("Usuário cadastrado com sucesso!");
         setUsuarioLogin({
-          cargo: '',
-          username: '',
-          telefone: ''
+          cargo: "",
+          username: "",
+          telefone: "",
         });
 
-        if (typeof onLogin === 'function') onLogin(data);  // chama onLogin só se existir e for função
+        if (typeof onLogin === "function") onLogin(data); // chama onLogin só se existir e for função
 
-        navigate('/');  // Redireciona para home
+        navigate("/"); // Redireciona para home
       })
-      .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao cadastrar usuário.');
+      .catch((error) => {
+        console.error("Erro:", error);
+        alert("Erro ao cadastrar usuário.");
       });
   };
 
@@ -55,11 +70,11 @@ const UsuarioLogin = ({ onLogin }) => {  // RECEBER onLogin como prop
       <div
         className="p-4 rounded-lg"
         style={{
-          border: '2px solid gold',
-          maxWidth: '400px',
-          width: '100%',
-          backgroundColor: '#fff',
-          borderRadius: '20px' // aumento do arredondamento
+          border: "2px solid gold",
+          maxWidth: "400px",
+          width: "100%",
+          backgroundColor: "#fff",
+          borderRadius: "20px", // aumento do arredondamento
         }}
       >
         <h2 className="text-center mb-4">Complete seu Registro</h2>
@@ -103,13 +118,20 @@ const UsuarioLogin = ({ onLogin }) => {  // RECEBER onLogin como prop
             />
           </div>
 
-          <button type="submit" className="btn w-100 text-white" style={{ backgroundColor: '#800000' }}>
+          <button
+            type="submit"
+            className="btn w-100 text-white"
+            style={{ backgroundColor: "#800000" }}
+          >
             Cadastrar
           </button>
         </form>
 
         <div className="text-center mt-3">
-          <a href="/loginCadastro" style={{ color: '#800000', textDecoration: 'none' }}>
+          <a
+            href="/loginCadastro"
+            style={{ color: "#800000", textDecoration: "none" }}
+          >
             Já tem conta? Faça login
           </a>
         </div>

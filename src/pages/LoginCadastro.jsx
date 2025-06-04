@@ -36,26 +36,15 @@ function LoginCadastro({ onLogin }) {
     }
 
     try {
-      console.log("Enviando dados:", { nome, email, password: senha });
       const response = await fetch("http://localhost:5268/Users/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome: nome,
-          email: email,
-          password: senha,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, password: senha }),
       });
-
-      console.log("Resposta do servidor:", response);
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Erro no cadastro:", errorData);
-
-        if (errorData.errors && errorData.errors.DuplicateUserName) {
+        if (errorData.errors?.DuplicateUserName) {
           setErro("E-mail já cadastrado. Tente outro e-mail.");
         } else {
           setErro(errorData.title || "Erro ao cadastrar.");
@@ -83,7 +72,6 @@ function LoginCadastro({ onLogin }) {
     }
 
     try {
-      console.log("Enviando dados de login:", { email, password: senha });
       const response = await fetch(
         "http://localhost:5268/Users/login?useCookies=false&useSessionCookies=false",
         {
@@ -92,27 +80,30 @@ function LoginCadastro({ onLogin }) {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: JSON.stringify({
-            email: email,
-            password: senha,
-          }),
+          body: JSON.stringify({ email, password: senha }),
         }
       );
 
-      console.log("Resposta do servidor:", response);
+      const data = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erro no login:", errorData);
-        setErro(errorData.message || "E-mail ou senha incorretos.");
+        setErro(data.message || "E-mail ou senha incorretos.");
         return;
       }
 
-      const data = await response.json();
-      localStorage.setItem("token", data.token || data);
+      // Capturar o token e o userId da resposta
+      const token = data.accessToken;
+
+      // Salvar o token e o userId no localStorage
+      if (typeof token === "string") {
+        localStorage.setItem("token", token);
+      } else {
+        console.error("Token inválido:", token);
+        setErro("Erro ao processar o token de autenticação.");
+        return;
+      }
 
       if (onLogin) onLogin({ email });
-
       // Verificando se o perfil do usuário existe
       const profileResponse = await fetch(
         `http://localhost:5268/api/UsuariosLogin/${email}`,
@@ -120,7 +111,7 @@ function LoginCadastro({ onLogin }) {
           method: "GET",
           headers: {
             accept: "text/plain",
-            Authorization: `Bearer ${data.token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -139,10 +130,6 @@ function LoginCadastro({ onLogin }) {
         localStorage.setItem("usuario", JSON.stringify(profileData));
         navigate("/"); // Redireciona para a página principal
       }
-      
-     
-
-      /*****/
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
       setErro("Erro ao conectar com o servidor.");
@@ -239,44 +226,34 @@ function LoginCadastro({ onLogin }) {
             className="btn w-100 rounded-pill"
             style={{
               backgroundColor: cores.destaque,
-              color: "#FFFFFF",
+              color: "#fff",
               fontWeight: "600",
-              fontSize: "16px",
-              padding: "10px 0",
-              transition: "0.3s",
+              transition: "background-color 0.3s",
             }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = cores.hover)
-            }
+            onMouseOver={(e) => (e.target.style.backgroundColor = cores.hover)}
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = cores.destaque)
+              (e.target.style.backgroundColor = cores.destaque)
             }
           >
             {modoCadastro ? "Cadastrar" : "Entrar"}
           </button>
-        </form>
 
-        <div className="mt-3 text-center">
-          <button
-            className="btn btn-link"
-            style={{
-              color: cores.destaque,
-              textDecoration: "none",
-              fontWeight: "500",
-            }}
-            onClick={() => {
-              setModoCadastro(!modoCadastro);
-              setErro("");
-              setNome("");
-              setEmail("");
-              setSenha("");
-            }}
+          <p
+            className="text-center mt-3"
+            style={{ fontSize: "14px", color: cores.texto }}
           >
-            {modoCadastro
-              ? "Já tem conta? Faça login"
-              : "Ainda não tem conta? Cadastre-se"}
-          </button>
-        </div>
+            {modoCadastro ? "Já tem uma conta?" : "Ainda não tem uma conta?"}{" "}
+            <span
+              style={{ color: cores.destaque, cursor: "pointer" }}
+              onClick={() => {
+                setModoCadastro(!modoCadastro);
+                setErro("");
+              }}
+            >
+              {modoCadastro ? "Entrar" : "Cadastrar"}
+            </span>
+          </p>
+        </form>
       </div>
     </div>
   );
