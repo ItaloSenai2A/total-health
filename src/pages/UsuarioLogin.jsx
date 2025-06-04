@@ -9,6 +9,8 @@ const UsuarioLogin = ({ onLogin }) => {
     telefone: "",
   });
 
+  const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,8 +20,19 @@ const UsuarioLogin = ({ onLogin }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    fetch(`http://localhost:5268/api/UsuariosLogin/${usuarioStorage.email}`, {
+      method: "POST",
+      headers: {
+        accept: "text/plain",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) {
+        localStorage.setItem("usuario", JSON.stringify(response)); // Armazena os dados do usuário no localStorage
+      }
+    });
 
-    fetch("http://localhost:5268/api/UsuariosLogin", {
+    fetch(`http://localhost:5268/api/UsuariosLogin`, {
       method: "POST",
       headers: {
         accept: "text/plain",

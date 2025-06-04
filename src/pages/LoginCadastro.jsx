@@ -126,6 +126,7 @@ function LoginCadastro({ onLogin }) {
 
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
+        // Se o perfil não existir, redireciona para a página de edição de perfil
         console.log("Perfil do usuário encontrado:", profileData);
         localStorage.setItem("usuario", JSON.stringify(profileData));
         navigate("/"); // Redireciona para a página principal
