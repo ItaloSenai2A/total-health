@@ -1,25 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Form, Modal, Row, Col } from "react-bootstrap";
 
-// Mock dados para seleção (substitua por API real)
-const medicosMock = [
-  { MedicoId: "1", Nome: "Dr. Carlos Souza" },
-  { MedicoId: "2", Nome: "Dra. Ana Paula" },
-];
-
-const especialidadesMock = [
-  { EspecialidadeId: "1", Nome: "Cardiologia" },
-  { EspecialidadeId: "2", Nome: "Dermatologia" },
-];
-
-const MedicoEspecialidade = () => {
-  const [lista, setLista] = useState([]);
+const Especialidade = () => {
+  const [especialidades, setEspecialidades] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editarId, setEditarId] = useState(null);
-
-  // Campos do formulário
-  const [medicoId, setMedicoId] = useState("");
-  const [especialidadeId, setEspecialidadeId] = useState("");
+  const [nome, setNome] = useState("");
 
   const cores = {
     fundoTela: "#F2F2F2",
@@ -32,93 +18,140 @@ const MedicoEspecialidade = () => {
     bordaDourada: "#D4AF37",
   };
 
+  // Função utilitária para recuperar o token
+  const getToken = () => localStorage.getItem("token");
+
   useEffect(() => {
-    const dados = localStorage.getItem("totalhealth_medicoespecialidade");
-    if (dados) setLista(JSON.parse(dados));
+    const dados = localStorage.getItem("totalhealth_especialidades");
+    if (dados) setEspecialidades(JSON.parse(dados));
   }, []);
 
-  const salvarLista = (novaLista) => {
-    localStorage.setItem("totalhealth_medicoespecialidade", JSON.stringify(novaLista));
+  const salvarEspecialidades = (lista) => {
+    localStorage.setItem("totalhealth_especialidades", JSON.stringify(lista));
   };
 
   const abrirModalNovo = () => {
     setEditarId(null);
-    setMedicoId("");
-    setEspecialidadeId("");
+    setNome("");
     setShowModal(true);
   };
 
-  const abrirModalEditar = (item) => {
-    setEditarId(item.MedicoEspecialidadeId);
-    setMedicoId(item.MedicoId);
-    setEspecialidadeId(item.EspecialidadeId);
+  const abrirModalEditar = (esp) => {
+    setEditarId(esp.EspecialidadeId);
+    setNome(esp.Nome);
     setShowModal(true);
   };
 
-  const validarCampos = () => {
-    if (!medicoId || !especialidadeId) {
-      alert("Por favor, selecione Médico e Especialidade.");
+  const validarNome = () => {
+    if (!nome.trim()) {
+      alert("O nome da especialidade é obrigatório.");
       return false;
     }
     return true;
   };
 
-  const salvarItem = () => {
-    if (!validarCampos()) return;
+  const salvarEspecialidade = async () => {
+    if (!validarNome()) return;
 
-    const novoItem = {
-      MedicoEspecialidadeId: editarId || crypto.randomUUID(),
-      MedicoId: medicoId,
-      EspecialidadeId: especialidadeId,
-      // Medico e Especialidade podem ser carregados via API ou mock para exibição
-    };
+    const token = getToken();
+    if (!token) {
+      alert("Token de autenticação não encontrado.");
+      return;
+    }
 
-    let listaAtualizada;
     if (editarId) {
-      listaAtualizada = lista.map((i) =>
-        i.MedicoEspecialidadeId === editarId ? novoItem : i
-      );
+      // Requisição PUT para editar (ajuste seu backend para aceitar essa rota)
+      try {
+        const response = await fetch(`http://localhost:5268/api/Especialidades/${editarId}`, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ especialidadeId: editarId, nome }),
+        });
+
+        if (response.ok) {
+          const listaAtualizada = especialidades.map((e) =>
+            e.EspecialidadeId === editarId ? { EspecialidadeId: editarId, Nome: nome } : e
+          );
+          setEspecialidades(listaAtualizada);
+          salvarEspecialidades(listaAtualizada);
+          setShowModal(false);
+        } else {
+          alert("Erro ao atualizar especialidade.");
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar especialidade:", error);
+        alert("Erro de rede.");
+      }
     } else {
-      listaAtualizada = [...lista, novoItem];
+      // Requisição POST para nova especialidade
+      try {
+        const response = await fetch("http://localhost:5268/api/Especialidades", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nome }),
+        });
+
+        if (response.ok) {
+          const novaEspecialidade = await response.json();
+          const novaLista = [...especialidades, novaEspecialidade];
+          setEspecialidades(novaLista);
+          salvarEspecialidades(novaLista);
+          setShowModal(false);
+        } else if (response.status === 401) {
+          alert("Não autorizado. Verifique seu token.");
+        } else {
+          alert("Erro ao salvar a especialidade.");
+        }
+      } catch (error) {
+        console.error("Erro ao salvar a especialidade:", error);
+        alert("Erro de rede ao tentar salvar.");
+      }
+    }
+  };
+
+  const excluirEspecialidade = async (id) => {
+    const token = getToken();
+    if (!token) {
+      alert("Token de autenticação não encontrado.");
+      return;
     }
 
-    setLista(listaAtualizada);
-    salvarLista(listaAtualizada);
-    setShowModal(false);
-  };
+    if (window.confirm("Tem certeza que deseja excluir esta especialidade?")) {
+      try {
+        const response = await fetch(`http://localhost:5268/api/Especialidades/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
 
-  const excluirItem = (id) => {
-    if (window.confirm("Tem certeza que deseja excluir esta associação?")) {
-      const listaFiltrada = lista.filter((i) => i.MedicoEspecialidadeId !== id);
-      setLista(listaFiltrada);
-      salvarLista(listaFiltrada);
+        if (response.ok) {
+          const listaFiltrada = especialidades.filter((e) => e.EspecialidadeId !== id);
+          setEspecialidades(listaFiltrada);
+          salvarEspecialidades(listaFiltrada);
+        } else {
+          alert("Erro ao excluir especialidade.");
+        }
+      } catch (error) {
+        console.error("Erro ao excluir especialidade:", error);
+        alert("Erro de rede.");
+      }
     }
-  };
-
-  const nomeMedico = (id) => {
-    const m = medicosMock.find((m) => m.MedicoId === id);
-    return m ? m.Nome : "Médico desconhecido";
-  };
-
-  const nomeEspecialidade = (id) => {
-    const e = especialidadesMock.find((e) => e.EspecialidadeId === id);
-    return e ? e.Nome : "Especialidade desconhecida";
   };
 
   return (
     <div
       className="container my-4"
-      style={{
-        backgroundColor: cores.fundoTela,
-        minHeight: "100vh",
-        padding: "20px",
-      }}
+      style={{ backgroundColor: cores.fundoTela, minHeight: "100vh", padding: "20px" }}
     >
-      <h2
-        className="mb-4"
-        style={{ color: cores.botaoPrincipal, fontWeight: "700" }}
-      >
-        Associação Médico & Especialidade
+      <h2 className="mb-4" style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+        Gerenciar Especialidades
       </h2>
 
       <Card
@@ -133,7 +166,7 @@ const MedicoEspecialidade = () => {
         }}
       >
         <Card.Body>
-          <h5>+ Adicionar Nova Associação</h5>
+          <h5>+ Adicionar Nova Especialidade</h5>
         </Card.Body>
       </Card>
 
@@ -145,49 +178,19 @@ const MedicoEspecialidade = () => {
         keyboard={false}
         size="lg"
       >
-        <Modal.Header
-          style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }}
-          closeButton
-        >
-          <Modal.Title>
-            {editarId ? "Editar Associação" : "Adicionar Nova Associação"}
-          </Modal.Title>
+        <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
+          <Modal.Title>{editarId ? "Editar Especialidade" : "Adicionar Nova Especialidade"}</Modal.Title>
         </Modal.Header>
-        <Modal.Body
-          style={{
-            backgroundColor: cores.fundoCard,
-            color: cores.textoSecundario,
-          }}
-        >
+        <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
           <Form>
-            <Form.Group controlId="formMedico" className="mb-3">
-              <Form.Label>Médico *</Form.Label>
-              <Form.Select
-                value={medicoId}
-                onChange={(e) => setMedicoId(e.target.value)}
-              >
-                <option value="">Selecione o médico</option>
-                {medicosMock.map((m) => (
-                  <option key={m.MedicoId} value={m.MedicoId}>
-                    {m.Nome}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group controlId="formEspecialidade" className="mb-3">
-              <Form.Label>Especialidade *</Form.Label>
-              <Form.Select
-                value={especialidadeId}
-                onChange={(e) => setEspecialidadeId(e.target.value)}
-              >
-                <option value="">Selecione a especialidade</option>
-                {especialidadesMock.map((e) => (
-                  <option key={e.EspecialidadeId} value={e.EspecialidadeId}>
-                    {e.Nome}
-                  </option>
-                ))}
-              </Form.Select>
+            <Form.Group controlId="formNomeEspecialidade" className="mb-3">
+              <Form.Label>Nome *</Form.Label>
+              <Form.Control
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Nome da especialidade"
+              />
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -197,7 +200,7 @@ const MedicoEspecialidade = () => {
           </Button>
           <Button
             style={{ backgroundColor: cores.botaoAtivo, border: "none" }}
-            onClick={salvarItem}
+            onClick={salvarEspecialidade}
           >
             {editarId ? "Salvar Alterações" : "Salvar"}
           </Button>
@@ -205,53 +208,45 @@ const MedicoEspecialidade = () => {
       </Modal>
 
       <Row>
-        {lista.length === 0 ? (
-          <p
-            className="text-center"
-            style={{ color: cores.textoSecundario, width: "100%" }}
-          >
-            Nenhuma associação cadastrada.
+        {especialidades.length === 0 ? (
+          <p className="text-center" style={{ color: cores.textoSecundario, width: "100%" }}>
+            Nenhuma especialidade cadastrada.
           </p>
         ) : (
-          lista.map((item) => (
-            <Col
-              md={4}
-              lg={3}
-              sm={6}
-              key={item.MedicoEspecialidadeId}
-              className="mb-4"
-            >
+          especialidades.map((esp) => (
+            <Col md={4} lg={3} sm={6} key={esp.EspecialidadeId} className="mb-4">
               <Card
                 style={{
                   backgroundColor: cores.fundoCard,
                   border: `2px solid ${cores.bordaDourada}`,
-                  cursor: "pointer",
                   color: cores.textoTitulo,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "100%",
                 }}
               >
                 <Card.Body>
-                  <Card.Title style={{ fontWeight: "700" }}>
-                    {nomeMedico(item.MedicoId)}
+                  <Card.Title style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+                    {esp.Nome}
                   </Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    {nomeEspecialidade(item.EspecialidadeId)}
-                  </Card.Subtitle>
+                </Card.Body>
+                <Card.Footer className="d-flex justify-content-between">
                   <Button
                     variant="outline-primary"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => abrirModalEditar(item)}
+                    onClick={() => abrirModalEditar(esp)}
+                    style={{ borderColor: cores.botaoPrincipal, color: cores.botaoPrincipal }}
                   >
                     Editar
                   </Button>
                   <Button
                     variant="outline-danger"
-                    size="sm"
-                    onClick={() => excluirItem(item.MedicoEspecialidadeId)}
+                    onClick={() => excluirEspecialidade(esp.EspecialidadeId)}
+                    style={{ borderColor: cores.botaoAtivo, color: cores.botaoAtivo }}
                   >
                     Excluir
                   </Button>
-                </Card.Body>
+                </Card.Footer>
               </Card>
             </Col>
           ))
@@ -261,4 +256,4 @@ const MedicoEspecialidade = () => {
   );
 };
 
-export default MedicoEspecialidade;
+export default Especialidade;
