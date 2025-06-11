@@ -34,8 +34,17 @@ const Medico = () => {
           return res.json();
         })
         .then((dados) => {
-          setMedicos(dados);
-          salvarMedicos(dados);
+          console.log("Dados brutos recebidos:", dados);
+
+          const medicosFormatados = dados.map((med) => ({
+            id: med.id ?? med.MedicoId ?? med.medicoId ?? null,
+            nome: med.nome ?? med.Nome ?? "",
+            crm: med.crm ?? med.Crm ?? "",
+          }));
+
+          console.log("Médicos formatados:", medicosFormatados);
+          setMedicos(medicosFormatados);
+          salvarMedicos(medicosFormatados);
         })
         .catch((err) => {
           console.error(err);
@@ -60,9 +69,9 @@ const Medico = () => {
   };
 
   const abrirModalEditar = (medico) => {
-    setEditarId(medico.MedicoId);
-    setNome(medico.Nome);
-    setCrm(medico.Crm);
+    setEditarId(medico.id);
+    setNome(medico.nome);
+    setCrm(medico.crm);
     setShowModal(true);
   };
 
@@ -78,9 +87,9 @@ const Medico = () => {
     if (!validarCampos()) return;
 
     const novoMedico = {
-      MedicoId: editarId || crypto.randomUUID(),
-      Nome: nome.trim(),
-      Crm: crm.trim(),
+      id: editarId || crypto.randomUUID(),
+      nome: nome.trim(),
+      crm: crm.trim(),
     };
 
     const token = localStorage.getItem("token");
@@ -113,15 +122,15 @@ const Medico = () => {
       })
       .then((data) => {
         const medicoSalvo = {
-          ...data,
-          Nome: nome.trim(),
-          Crm: crm.trim(),
+          id: data.id ?? novoMedico.id,
+          nome: nome.trim(),
+          crm: crm.trim(),
         };
 
         let listaAtualizada;
         if (editarId) {
           listaAtualizada = medicos.map((m) =>
-            m.MedicoId === editarId ? medicoSalvo : m
+            m.id === editarId ? medicoSalvo : m
           );
         } else {
           listaAtualizada = [...medicos, medicoSalvo];
@@ -138,9 +147,31 @@ const Medico = () => {
 
   const excluirMedico = (id) => {
     if (window.confirm("Tem certeza que deseja excluir este médico?")) {
-      const listaFiltrada = medicos.filter((m) => m.MedicoId !== id);
-      setMedicos(listaFiltrada);
-      salvarMedicos(listaFiltrada);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Usuário não autenticado. Faça login novamente.");
+        return;
+      }
+
+      fetch(`http://localhost:5268/api/Medicos/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Erro ao excluir médico.");
+          }
+          const listaFiltrada = medicos.filter((m) => m.id !== id);
+          setMedicos(listaFiltrada);
+          salvarMedicos(listaFiltrada);
+          alert("Médico excluído com sucesso.");
+        })
+        .catch((err) => {
+          console.error(err);
+          alert(err.message);
+        });
     }
   };
 
@@ -222,41 +253,48 @@ const Medico = () => {
             Nenhum médico cadastrado.
           </p>
         ) : (
-          medicos.map((medico) => (
-            <Col md={4} lg={3} sm={6} key={medico.MedicoId} className="mb-4">
-              <Card
-                style={{
-                  backgroundColor: cores.fundoCard,
-                  border: `2px solid ${cores.bordaDourada}`,
-                  cursor: "default",
-                  color: cores.textoTitulo,
-                }}
-              >
-                <Card.Body>
-                  <Card.Title style={{ fontWeight: "700" }}>{medico.Nome}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">CRM: {medico.Crm}</Card.Subtitle>
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => abrirModalEditar(medico)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      excluirMedico(medico.MedicoId);
-                    }}
-                  >
-                    Excluir
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))
+          medicos.map((medico) => {
+            console.log("medico no map:", medico);
+            return (
+              <Col md={4} lg={3} sm={6} key={medico.id}>
+                <Card
+                  style={{
+                    backgroundColor: cores.fundoCard,
+                    border: `2px solid ${cores.bordaDourada}`,
+                    cursor: "default",
+                    color: cores.textoTitulo,
+                  }}
+                >
+                  <Card.Body>
+                    <Card.Title style={{ fontWeight: "700" }}>{medico.nome}</Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">CRM: {medico.crm}</Card.Subtitle>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => abrirModalEditar(medico)}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => {
+                        console.log("Tentando excluir:", medico);
+                        if (medico.id) {
+                          excluirMedico(medico.id);
+                        } else {
+                          alert("Erro: identificador do médico indefinido.");
+                        }
+                      }}
+                    >
+                      Excluir
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            );
+          })
         )}
       </Row>
     </div>
