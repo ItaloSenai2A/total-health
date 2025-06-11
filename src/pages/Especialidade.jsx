@@ -18,32 +18,33 @@ const Especialidade = () => {
     bordaDourada: "#D4AF37",
   };
 
-  // Carregar do localStorage
   useEffect(() => {
     const dados = localStorage.getItem("totalhealth_especialidades");
-    if (dados) setEspecialidades(JSON.parse(dados));
+    if (dados) {
+      const convertidos = JSON.parse(dados).map((e) => ({
+        EspecialidadeId: e.EspecialidadeId ?? e.id,
+        Nome: e.Nome ?? e.nome,
+      }));
+      setEspecialidades(convertidos);
+    }
   }, []);
 
-  // Salvar no localStorage
   const salvarEspecialidades = (lista) => {
     localStorage.setItem("totalhealth_especialidades", JSON.stringify(lista));
   };
 
-  // Abrir modal para novo
   const abrirModalNovo = () => {
     setEditarId(null);
     setNome("");
     setShowModal(true);
   };
 
-  // Abrir modal para editar
   const abrirModalEditar = (esp) => {
     setEditarId(esp.EspecialidadeId);
     setNome(esp.Nome);
     setShowModal(true);
   };
 
-  // Validar nome
   const validarNome = () => {
     if (!nome.trim()) {
       alert("O nome da especialidade é obrigatório.");
@@ -52,35 +53,98 @@ const Especialidade = () => {
     return true;
   };
 
-  // Salvar novo ou editar
-  const salvarEspecialidade = () => {
+  const salvarEspecialidade = async () => {
     if (!validarNome()) return;
 
-    if (editarId) {
-      const listaAtualizada = especialidades.map((e) =>
-        e.EspecialidadeId === editarId ? { EspecialidadeId: editarId, Nome: nome } : e
-      );
-      setEspecialidades(listaAtualizada);
-      salvarEspecialidades(listaAtualizada);
-    } else {
-      const novaEspecialidade = {
-        EspecialidadeId: crypto.randomUUID(),
-        Nome: nome,
-      };
-      const novaLista = [...especialidades, novaEspecialidade];
-      setEspecialidades(novaLista);
-      salvarEspecialidades(novaLista);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Token de autenticação não encontrado.");
+      return;
     }
 
-    setShowModal(false);
-  };
+    try {
+      if (editarId) {
+        const response = await fetch(`http://localhost:5268/api/Especialidades/${editarId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id: editarId, nome }), // Alteração importante aqui
+        });
 
-  // Excluir
-  const excluirEspecialidade = (id) => {
-    if (window.confirm("Tem certeza que deseja excluir esta especialidade?")) {
-      const listaFiltrada = especialidades.filter((e) => e.EspecialidadeId !== id);
-      setEspecialidades(listaFiltrada);
-      salvarEspecialidades(listaFiltrada);
+        if (response.ok) {
+          const listaAtualizada = especialidades.map((e) =>
+            e.EspecialidadeId === editarId ? { EspecialidadeId: editarId, Nome: nome } : e
+          );
+          setEspecialidades(listaAtualizada);
+          salvarEspecialidades(listaAtualizada);
+          setShowModal(false);
+        } else {
+          alert("Erro ao editar especialidade.");
+        }
+      } else {
+        const response = await fetch("http://localhost:5268/api/Especialidades", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ nome }),
+        });
+
+        if (response.ok) {
+          const novaEspecialidade = await response.json();
+          const novaLista = [
+            ...especialidades,
+            {
+              EspecialidadeId: novaEspecialidade.EspecialidadeId ?? novaEspecialidade.id,
+              Nome: novaEspecialidade.Nome ?? novaEspecialidade.nome,
+            },
+          ];
+          setEspecialidades(novaLista);
+          salvarEspecialidades(novaLista);
+          setShowModal(false);
+        } else {
+          alert("Erro ao salvar especialidade.");
+        }
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      alert("Erro de rede ao tentar salvar/editar.");
+    }
+  };
+  console.log(especialidades);
+
+  const excluirEspecialidade = async (id) => {
+    if (!window.confirm("Tem certeza que deseja excluir esta especialidade?")) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Token de autenticação não encontrado.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5268/api/Especialidades/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "text/plain",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const listaFiltrada = especialidades.filter((e) => e.EspecialidadeId !== id);
+        setEspecialidades(listaFiltrada);
+        salvarEspecialidades(listaFiltrada);
+      } else {
+        alert("Erro ao excluir especialidade.");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      alert("Erro de rede ao tentar excluir.");
     }
   };
 
@@ -137,10 +201,7 @@ const Especialidade = () => {
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancelar
           </Button>
-          <Button
-            style={{ backgroundColor: cores.botaoAtivo, border: "none" }}
-            onClick={salvarEspecialidade}
-          >
+          <Button style={{ backgroundColor: cores.botaoAtivo, border: "none" }} onClick={salvarEspecialidade}>
             {editarId ? "Salvar Alterações" : "Salvar"}
           </Button>
         </Modal.Footer>
