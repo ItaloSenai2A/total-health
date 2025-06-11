@@ -24,7 +24,7 @@ const Medico = () => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      fetch("http://localhost:5268/api/Medicos", {
+      fetch("https://totalhealth.somee.com/api/Medicos", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -100,8 +100,8 @@ const Medico = () => {
 
     const method = editarId ? "PUT" : "POST";
     const url = editarId
-      ? `http://localhost:5268/api/Medicos/${editarId}`
-      : "http://localhost:5268/api/Medicos";
+      ? `https://totalhealth.somee.com/api/Medicos/${editarId}`
+      : "https://totalhealth.somee.com/api/Medicos";
 
     fetch(url, {
       method: method,
@@ -153,7 +153,7 @@ const Medico = () => {
         return;
       }
 
-      fetch(`http://localhost:5268/api/Medicos/${id}`, {
+      fetch(`https://totalhealth.somee.com/api/Medicos/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -178,9 +178,16 @@ const Medico = () => {
   return (
     <div
       className="container my-4"
-      style={{ backgroundColor: cores.fundoTela, minHeight: "100vh", padding: "20px" }}
+      style={{
+        backgroundColor: cores.fundoTela,
+        minHeight: "100vh",
+        padding: "20px",
+      }}
     >
-      <h2 className="mb-4" style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+      <h2
+        className="mb-4"
+        style={{ color: cores.botaoPrincipal, fontWeight: "700" }}
+      >
         Gerenciar Médicos
       </h2>
 
@@ -208,10 +215,20 @@ const Medico = () => {
         keyboard={false}
         size="md"
       >
-        <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
-          <Modal.Title>{editarId ? "Editar Médico" : "Adicionar Novo Médico"}</Modal.Title>
+        <Modal.Header
+          style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }}
+          closeButton
+        >
+          <Modal.Title>
+            {editarId ? "Editar Médico" : "Adicionar Novo Médico"}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
+        <Modal.Body
+          style={{
+            backgroundColor: cores.fundoCard,
+            color: cores.textoSecundario,
+          }}
+        >
           <Form>
             <Form.Group controlId="formNome" className="mb-3">
               <Form.Label>Nome *</Form.Label>
@@ -249,7 +266,10 @@ const Medico = () => {
 
       <Row>
         {medicos.length === 0 ? (
-          <p className="text-center" style={{ color: cores.textoSecundario, width: "100%" }}>
+          <p
+            className="text-center"
+            style={{ color: cores.textoSecundario, width: "100%" }}
+          >
             Nenhum médico cadastrado.
           </p>
         ) : (
@@ -266,8 +286,12 @@ const Medico = () => {
                   }}
                 >
                   <Card.Body>
-                    <Card.Title style={{ fontWeight: "700" }}>{medico.nome}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">CRM: {medico.crm}</Card.Subtitle>
+                    <Card.Title style={{ fontWeight: "700" }}>
+                      {medico.nome}
+                    </Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      CRM: {medico.crm}
+                    </Card.Subtitle>
                     <Button
                       variant="outline-primary"
                       size="sm"

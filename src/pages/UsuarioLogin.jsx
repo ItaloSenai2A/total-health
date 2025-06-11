@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const UsuarioLogin = ({ onLogin }) => {
+  const navigate = useNavigate();
   // RECEBER onLogin como prop
   const [usuarioLogin, setUsuarioLogin] = useState({
     cargo: "",
@@ -9,9 +10,13 @@ const UsuarioLogin = ({ onLogin }) => {
     telefone: "",
   });
 
-  const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
+  useEffect(() => {
+    if (localStorage.getItem("contador")) {
+      navigate("/"); // Redireciona para a página principal se já estiver logado
+    }
+  }, [navigate]);
 
-  const navigate = useNavigate();
+  const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,19 +25,22 @@ const UsuarioLogin = ({ onLogin }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(`http://localhost:5268/api/UsuariosLogin/${usuarioStorage.email}`, {
-      method: "POST",
-      headers: {
-        accept: "text/plain",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then(async (response) => {
+    fetch(
+      `https://totalhealth.somee.com/api/UsuariosLogin/${usuarioStorage.email}`,
+      {
+        method: "POST",
+        headers: {
+          accept: "text/plain",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    ).then(async (response) => {
       if (response.ok) {
         localStorage.setItem("usuario", JSON.stringify(response)); // Armazena os dados do usuário no localStorage
       }
     });
 
-    fetch(`http://localhost:5268/api/UsuariosLogin`, {
+    fetch(`https://totalhealth.somee.com/api/UsuariosLogin`, {
       method: "POST",
       headers: {
         accept: "text/plain",
@@ -53,15 +61,6 @@ const UsuarioLogin = ({ onLogin }) => {
           data = await response.json();
         }
 
-        // // Supondo que o token JWT é retornado na resposta
-        // const token = data.token;
-        // if (typeof token === 'string') {
-        //   // Armazene o token no localStorage como uma string
-        //   localStorage.setItem('token', token);
-        // } else {
-        //   console.error('Token JWT não é uma string:', token);
-        // }
-
         alert("Usuário cadastrado com sucesso!");
         setUsuarioLogin({
           cargo: "",
@@ -70,8 +69,11 @@ const UsuarioLogin = ({ onLogin }) => {
         });
 
         if (typeof onLogin === "function") onLogin(data); // chama onLogin só se existir e for função
-
-        navigate("/"); // Redireciona para home
+        localStorage.setItem(
+          "contador",
+          parseInt(localStorage.getItem("contador") || 0) + 1
+        ); // Atualiza o contador para redirecionar após o cadastro
+        window.location.reload(); // Redireciona para home
       })
       .catch((error) => {
         console.error("Erro:", error);

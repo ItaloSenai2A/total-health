@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function LoginCadastro({ onLogin }) {
   const [modoCadastro, setModoCadastro] = useState(true);
-  const [nome, setNome] = useState("");
+  // const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
@@ -17,9 +17,15 @@ function LoginCadastro({ onLogin }) {
     borda: "#D4AF37",
   };
 
+  useEffect(() => {
+    if (localStorage.getItem("usuario")) {
+      navigate("/"); // Redireciona para a página principal
+    }
+  }, [navigate]);
+
   const handleSubmitCadastro = async (e) => {
     e.preventDefault();
-    if (!nome.trim() || !email.trim() || !senha.trim()) {
+    if (!email.trim() || !senha.trim()) {
       setErro("Preencha todos os campos.");
       return;
     }
@@ -36,11 +42,14 @@ function LoginCadastro({ onLogin }) {
     }
 
     try {
-      const response = await fetch("http://localhost:5268/Users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome, email, password: senha }),
-      });
+      const response = await fetch(
+        "https://totalhealth.somee.com/Users/register",
+        {
+          method: "POST",
+          headers: { accept: "*/*", "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password: senha }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -54,7 +63,6 @@ function LoginCadastro({ onLogin }) {
 
       setModoCadastro(false);
       setErro("");
-      setNome("");
       setEmail("");
       setSenha("");
       alert("Cadastro realizado com sucesso! Faça login para continuar.");
@@ -73,7 +81,7 @@ function LoginCadastro({ onLogin }) {
 
     try {
       const response = await fetch(
-        "http://localhost:5268/Users/login?useCookies=false&useSessionCookies=false",
+        "https://totalhealth.somee.com/Users/login?useCookies=false&useSessionCookies=false",
         {
           method: "POST",
           headers: {
@@ -106,7 +114,7 @@ function LoginCadastro({ onLogin }) {
       if (onLogin) onLogin({ email });
       // Verificando se o perfil do usuário existe
       const profileResponse = await fetch(
-        `http://localhost:5268/api/UsuariosLogin/${email}`,
+        `https://totalhealth.somee.com/api/UsuariosLogin/${email}`,
         {
           method: "GET",
           headers: {
@@ -129,7 +137,7 @@ function LoginCadastro({ onLogin }) {
         // Se o perfil não existir, redireciona para a página de edição de perfil
         console.log("Perfil do usuário encontrado:", profileData);
         localStorage.setItem("usuario", JSON.stringify(profileData));
-        navigate("/"); // Redireciona para a página principal
+        window.location.reload(); // Recarrega a página para atualizar o estado do usuário
       }
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
@@ -172,7 +180,7 @@ function LoginCadastro({ onLogin }) {
         <form
           onSubmit={modoCadastro ? handleSubmitCadastro : handleSubmitLogin}
         >
-          {modoCadastro && (
+          {/* {modoCadastro && (
             <div className="mb-3">
               <label className="form-label" style={{ fontWeight: "500" }}>
                 Nome completo:
@@ -185,7 +193,7 @@ function LoginCadastro({ onLogin }) {
                 required
               />
             </div>
-          )}
+          )} */}
 
           <div className="mb-3">
             <label className="form-label" style={{ fontWeight: "500" }}>

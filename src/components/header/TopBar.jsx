@@ -1,11 +1,32 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 
-const TopBar = ({ usuario }) => {
+const TopBar = () => {
+  const [usuario, setUsuario] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const [menuAberto, setMenuAberto] = useState(false);
   const menuRef = useRef(null);
+
+  useEffect(() => {
+    const atualizarUsuario = () => {
+      const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
+      if (usuarioStorage) {
+        setUsuario(usuarioStorage);
+      }
+    };
+
+    // Atualiza o estado ao montar o componente
+    atualizarUsuario();
+
+    // Adiciona um listener para mudanças no localStorage
+    window.addEventListener("storage", atualizarUsuario);
+
+    // Remove o listener ao desmontar o componente
+    return () => {
+      window.removeEventListener("storage", atualizarUsuario);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickFora = (e) => {
@@ -66,7 +87,13 @@ const TopBar = ({ usuario }) => {
               className="d-none d-md-inline"
               style={{ color: "#3A3A3A", fontWeight: "500" }}
             >
-              Olá, {usuario?.nome ? usuario.nome.split(" ")[0] : "Usuário"}!
+              Olá,{" "}
+              {usuario?.nome
+                ? usuario.nome.split(" ")[0]
+                : usuario?.username
+                ? usuario.username.split(" ")[0]
+                : "Usuário"}
+              !
             </span>
             <img
               src={`https://ui-avatars.com/api/?name=${usuario.nome}&background=8B0000&color=ffffff`}

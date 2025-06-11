@@ -17,22 +17,25 @@ const Usuario = () => {
     endereco: "",
   });
 
-  const token = localStorage.getItem('token'); // Recupera o token armazenado
+  const token = localStorage.getItem("token"); // Recupera o token armazenado
 
   // Carrega usuários da API no carregamento
   useEffect(() => {
     const carregarUsuarios = async () => {
       try {
-        const response = await fetch("http://localhost:5268/api/Usuarios", {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
+        const response = await fetch(
+          "https://totalhealth.somee.com/api/Usuarios",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
 
         if (!response.ok) {
-          throw new Error('Erro ao carregar usuários');
+          throw new Error("Erro ao carregar usuários");
         }
 
         const dados = await response.json();
@@ -51,7 +54,11 @@ const Usuario = () => {
   };
 
   const validarCampos = () => {
-    if (!novoUsuario.nome.trim() || !novoUsuario.telefone.trim() || !novoUsuario.cpf.trim()) {
+    if (
+      !novoUsuario.nome.trim() ||
+      !novoUsuario.telefone.trim() ||
+      !novoUsuario.cpf.trim()
+    ) {
       alert("Nome, Telefone e CPF são obrigatórios.");
       return false;
     }
@@ -87,18 +94,18 @@ const Usuario = () => {
       let response;
 
       const url = editarUsuario
-        ? `http://localhost:5268/api/Usuarios/${editarUsuario}`
-        : "http://localhost:5268/api/Usuarios";
+        ? `https://totalhealth.somee.com/api/Usuarios/${editarUsuario}`
+        : "https://totalhealth.somee.com/api/Usuarios";
 
       const method = editarUsuario ? "PUT" : "POST";
 
       response = await fetch(url, {
         method,
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(novoUsuario)
+        body: JSON.stringify(novoUsuario),
       });
 
       if (!response.ok) {
@@ -127,15 +134,18 @@ const Usuario = () => {
   const handleExcluir = async (id) => {
     if (window.confirm("Tem certeza que deseja excluir este usuário?")) {
       try {
-        const response = await fetch(`http://localhost:5268/api/Usuarios/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${token}`
+        const response = await fetch(
+          `https://totalhealth.somee.com/api/Usuarios/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
 
         if (!response.ok) {
-          throw new Error('Erro ao excluir usuário');
+          throw new Error("Erro ao excluir usuário");
         }
 
         const listaFiltrada = usuarios.filter((u) => u.usuarioId !== id);
@@ -160,9 +170,16 @@ const Usuario = () => {
   return (
     <div
       className="container my-4"
-      style={{ backgroundColor: cores.fundoTela, minHeight: "100vh", padding: "20px" }}
+      style={{
+        backgroundColor: cores.fundoTela,
+        minHeight: "100vh",
+        padding: "20px",
+      }}
     >
-      <h2 className="mb-4" style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+      <h2
+        className="mb-4"
+        style={{ color: cores.botaoPrincipal, fontWeight: "700" }}
+      >
         Gerenciar Usuários
       </h2>
 
@@ -190,10 +207,20 @@ const Usuario = () => {
         keyboard={false}
         size="lg"
       >
-        <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
-          <Modal.Title>{editarUsuario ? "Editar Usuário" : "Adicionar Novo Usuário"}</Modal.Title>
+        <Modal.Header
+          style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }}
+          closeButton
+        >
+          <Modal.Title>
+            {editarUsuario ? "Editar Usuário" : "Adicionar Novo Usuário"}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
+        <Modal.Body
+          style={{
+            backgroundColor: cores.fundoCard,
+            color: cores.textoSecundario,
+          }}
+        >
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Nome *</Form.Label>
@@ -252,7 +279,11 @@ const Usuario = () => {
 
             <Form.Group className="mb-3">
               <Form.Label>Gênero</Form.Label>
-              <Form.Select name="genero" value={novoUsuario.genero} onChange={handleChange}>
+              <Form.Select
+                name="genero"
+                value={novoUsuario.genero}
+                onChange={handleChange}
+              >
                 <option value="">Selecione</option>
                 <option value="Feminino">Feminino</option>
                 <option value="Masculino">Masculino</option>
@@ -316,11 +347,13 @@ const Usuario = () => {
               style={{
                 backgroundColor: cores.fundoCard,
                 border: `1px solid ${cores.bordaDourada}`,
-                padding: "10px"
+                padding: "10px",
               }}
             >
               <Card.Body>
-                <Card.Title style={{ color: cores.textoTitulo }}>{usuario.nome}</Card.Title>
+                <Card.Title style={{ color: cores.textoTitulo }}>
+                  {usuario.nome}
+                </Card.Title>
                 <Card.Text style={{ color: cores.textoSecundario }}>
                   Email: {usuario.email} <br />
                   Telefone: {usuario.telefone} <br />

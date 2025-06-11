@@ -96,7 +96,7 @@ const ChatBot = () => {
   };
 
   return (
-    <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 9999 }}>
+    <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 9999}}>
       {chatAberto ? (
         <div
           className="chat-container"
@@ -228,7 +228,10 @@ const ChatBot = () => {
             border: "none",
             color: "white",
             borderRadius: "50%",
-            padding: 14,
+            paddingBottom: 15,
+            paddingTop: 12,
+            paddingLeft: 18,
+            paddingRight: 18,
             fontSize: 20,
             boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
             cursor: "pointer",

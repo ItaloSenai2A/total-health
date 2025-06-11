@@ -64,7 +64,10 @@ function App() {
                 element={<LoginCadastro onLogin={handleLogin} />}
               />
 
-<Route path ="/usuarioLogin" element={<UsuarioLogin onLogin={handleLogin} />} />
+              <Route
+                path="/usuarioLogin"
+                element={<UsuarioLogin onLogin={handleLogin} />}
+              />
 
               <Route
                 path="/"

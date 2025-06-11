@@ -62,18 +62,23 @@ const Especialidade = () => {
     if (editarId) {
       // Requisição PUT para editar (ajuste seu backend para aceitar essa rota)
       try {
-        const response = await fetch(`http://localhost:5268/api/Especialidades/${editarId}`, {
-          method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ especialidadeId: editarId, nome }),
-        });
+        const response = await fetch(
+          `https://totalhealth.somee.com/api/Especialidades/${editarId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ especialidadeId: editarId, nome }),
+          }
+        );
 
         if (response.ok) {
           const listaAtualizada = especialidades.map((e) =>
-            e.EspecialidadeId === editarId ? { EspecialidadeId: editarId, Nome: nome } : e
+            e.EspecialidadeId === editarId
+              ? { EspecialidadeId: editarId, Nome: nome }
+              : e
           );
           setEspecialidades(listaAtualizada);
           salvarEspecialidades(listaAtualizada);
@@ -88,14 +93,17 @@ const Especialidade = () => {
     } else {
       // Requisição POST para nova especialidade
       try {
-        const response = await fetch("http://localhost:5268/api/Especialidades", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ nome }),
-        });
+        const response = await fetch(
+          "https://totalhealth.somee.com/api/Especialidades",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ nome }),
+          }
+        );
 
         if (response.ok) {
           const novaEspecialidade = await response.json();
@@ -124,15 +132,20 @@ const Especialidade = () => {
 
     if (window.confirm("Tem certeza que deseja excluir esta especialidade?")) {
       try {
-        const response = await fetch(`http://localhost:5268/api/Especialidades/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `https://totalhealth.somee.com/api/Especialidades/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (response.ok) {
-          const listaFiltrada = especialidades.filter((e) => e.EspecialidadeId !== id);
+          const listaFiltrada = especialidades.filter(
+            (e) => e.EspecialidadeId !== id
+          );
           setEspecialidades(listaFiltrada);
           salvarEspecialidades(listaFiltrada);
         } else {
@@ -148,9 +161,16 @@ const Especialidade = () => {
   return (
     <div
       className="container my-4"
-      style={{ backgroundColor: cores.fundoTela, minHeight: "100vh", padding: "20px" }}
+      style={{
+        backgroundColor: cores.fundoTela,
+        minHeight: "100vh",
+        padding: "20px",
+      }}
     >
-      <h2 className="mb-4" style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+      <h2
+        className="mb-4"
+        style={{ color: cores.botaoPrincipal, fontWeight: "700" }}
+      >
         Gerenciar Especialidades
       </h2>
 
@@ -178,10 +198,20 @@ const Especialidade = () => {
         keyboard={false}
         size="lg"
       >
-        <Modal.Header style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }} closeButton>
-          <Modal.Title>{editarId ? "Editar Especialidade" : "Adicionar Nova Especialidade"}</Modal.Title>
+        <Modal.Header
+          style={{ backgroundColor: cores.botaoPrincipal, color: "#fff" }}
+          closeButton
+        >
+          <Modal.Title>
+            {editarId ? "Editar Especialidade" : "Adicionar Nova Especialidade"}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: cores.fundoCard, color: cores.textoSecundario }}>
+        <Modal.Body
+          style={{
+            backgroundColor: cores.fundoCard,
+            color: cores.textoSecundario,
+          }}
+        >
           <Form>
             <Form.Group controlId="formNomeEspecialidade" className="mb-3">
               <Form.Label>Nome *</Form.Label>
@@ -209,12 +239,21 @@ const Especialidade = () => {
 
       <Row>
         {especialidades.length === 0 ? (
-          <p className="text-center" style={{ color: cores.textoSecundario, width: "100%" }}>
+          <p
+            className="text-center"
+            style={{ color: cores.textoSecundario, width: "100%" }}
+          >
             Nenhuma especialidade cadastrada.
           </p>
         ) : (
           especialidades.map((esp) => (
-            <Col md={4} lg={3} sm={6} key={esp.EspecialidadeId} className="mb-4">
+            <Col
+              md={4}
+              lg={3}
+              sm={6}
+              key={esp.EspecialidadeId}
+              className="mb-4"
+            >
               <Card
                 style={{
                   backgroundColor: cores.fundoCard,
@@ -227,7 +266,9 @@ const Especialidade = () => {
                 }}
               >
                 <Card.Body>
-                  <Card.Title style={{ color: cores.botaoPrincipal, fontWeight: "700" }}>
+                  <Card.Title
+                    style={{ color: cores.botaoPrincipal, fontWeight: "700" }}
+                  >
                     {esp.Nome}
                   </Card.Title>
                 </Card.Body>
@@ -235,14 +276,20 @@ const Especialidade = () => {
                   <Button
                     variant="outline-primary"
                     onClick={() => abrirModalEditar(esp)}
-                    style={{ borderColor: cores.botaoPrincipal, color: cores.botaoPrincipal }}
+                    style={{
+                      borderColor: cores.botaoPrincipal,
+                      color: cores.botaoPrincipal,
+                    }}
                   >
                     Editar
                   </Button>
                   <Button
                     variant="outline-danger"
                     onClick={() => excluirEspecialidade(esp.EspecialidadeId)}
-                    style={{ borderColor: cores.botaoAtivo, color: cores.botaoAtivo }}
+                    style={{
+                      borderColor: cores.botaoAtivo,
+                      color: cores.botaoAtivo,
+                    }}
                   >
                     Excluir
                   </Button>
